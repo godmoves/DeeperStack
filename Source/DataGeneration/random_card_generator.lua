@@ -1,7 +1,7 @@
 --- Samples random card combinations.
 -- @module random_card_generator
 
-require "torch"
+require 'torch'
 local M = {}
 local game_settings = require 'Settings.game_settings'
 local arguments = require 'Settings.arguments'
@@ -13,7 +13,7 @@ local arguments = require 'Settings.arguments'
 --
 -- @param count the number of cards to sample
 -- @return a vector of cards, represented numerically
-function M:generate_cards( count )
+function M:generate_cards(count)
   --marking all used cards
   local used_cards = torch.ByteTensor(game_settings.card_count):zero()
   
