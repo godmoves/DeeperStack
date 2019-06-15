@@ -39,6 +39,7 @@ function file_exists(name)
 end
 
 --- Initializes the tensor that translates hand ranges to bucket ranges.
+-- @param board a vector to represent current board
 -- @local
 function NextRoundValuePre:_init_bucketing(board)
   local street = card_tools:board_to_street(board)
@@ -124,10 +125,21 @@ function NextRoundValuePre:_card_range_to_bucket_range(card_range, bucket_range)
       :expand(card_range:size(1),self.board_count, game_settings.hand_count))
 end
 
+--- Converts a range vector over private hands to a range vector over buckets for aux round.
+-- @param card_range a probability vector over private hands
+-- @param bucket_range a vector in which to store the output probabilities
+--  over buckets
+-- @local
 function NextRoundValuePre:_card_range_to_bucket_range_aux(card_range, bucket_range)
   bucket_range:mm(card_range, self._range_matrix_aux)
 end
 
+--- Converts a range vector over private hands to a range vector over buckets.
+-- @param board_idx index of current board
+-- @param card_range a probability vector over private hands
+-- @param bucket_range a vector in which to store the output probabilities
+--  over buckets
+-- @local
 function NextRoundValuePre:_card_range_to_bucket_range_on_board(board_idx, card_range, bucket_range)
   local other_bucket_range = bucket_range:view(-1,self.bucket_count + 1):zero()
 
@@ -200,6 +212,20 @@ function NextRoundValuePre:start_computation(pot_sizes, batch_size)
   self.batch_size = self.pot_sizes:size(1)
 end
 
+--- Gives the predicted counterfactual values at each evaluated state for
+-- aux round, given input ranges.
+--
+-- @{start_computation} must be called first. Each state to be evaluated must
+-- be given in the same order that pot sizes were given for that function.
+-- Keeps track of iterations internally, so should be called exactly once for
+-- every iteration of continual re-solving.
+--
+-- @param ranges An Nx2xK tensor, where N is the number of states evaluated
+-- (must match input to @{start_computation}), 2 is the number of players, and
+-- K is the number of private hands. Contains N sets of 2 range vectors.
+-- @param values an Nx2xK tensor in which to store the N sets of 2 value vectors
+-- which are output
+-- @param next_board_idx index of next board
 function NextRoundValuePre:get_value_aux(ranges, values, next_board_idx)
   assert(ranges and values)
   assert(ranges:size(1) == self.batch_size, self.batch_size .. " " .. ranges:size(1))

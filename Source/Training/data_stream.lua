@@ -8,7 +8,8 @@ local bucketer = require 'Nn.bucketer'
 local constants = require 'Settings.constants'
 local DataStream = torch.class('DataStream')
 
--- Lua implementation of PHP scandir function
+--- Lua implementation of PHP scandir function
+-- @param directory directory to scan
 function DataStream:_scandir(directory)
   local i, t, popen = 0, {}, io.popen
   local pfile = popen('ls -a "' .. directory .. '"')

@@ -17,6 +17,7 @@ local tools = require 'tools'
 
 local M = {}
 
+--- Constructor
 function M:_init()
   if self._ihr_pair_to_bucket == nil then
     local file_found = io.open("./Nn/Bucketing/riverihrarray.dat", "r")

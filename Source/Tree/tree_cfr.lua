@@ -43,8 +43,7 @@ end
 -- @param node the current node in the tree
 -- @param iter the current iteration number
 -- @local
-function TreeCFR:cfrs_iter_dfs( node, iter )
-
+function TreeCFR:cfrs_iter_dfs(node, iter)
   assert(node.current_player == constants.players.P1 or node.current_player == constants.players.P2 or node.current_player == constants.players.chance)
 
   local opponent_index = 3 - node.current_player

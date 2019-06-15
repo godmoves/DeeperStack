@@ -21,7 +21,8 @@ local DataStreamMem = torch.class('RawConverter')
 
 require 'Nn.bucket_conversion'
 
--- Lua implementation of PHP scandir function
+--- Lua implementation of PHP scandir function
+-- @param directory directory to scan
 function scandir(directory)
   local i, t, popen = 0, {}, io.popen
   local pfile = popen('ls -a "' .. directory .. '"')
@@ -33,6 +34,8 @@ function scandir(directory)
   return t
 end
 
+--- Converts raw training data to bucket data
+-- @param street which street the data is
 function convert(street)
   local srcfolder = "srcfolder"
   local destfolder = "destfolder"

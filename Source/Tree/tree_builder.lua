@@ -211,7 +211,6 @@ end
 -- @return `current_node` after the (sub)tree has been built
 -- @local
 function PokerTreeBuilder:_build_tree_dfs(current_node)
-
   self:_fill_additional_attributes(current_node)
   local children = self:_get_children_nodes(current_node)
   current_node.children = children

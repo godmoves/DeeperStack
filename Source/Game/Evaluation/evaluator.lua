@@ -17,6 +17,7 @@ local arguments = require 'Settings.arguments'
 
 local M = {_texas_lookup = nil}
 
+--- Constructor
 function M:_init()
   self._idx_to_cards = arguments.Tensor(game_settings.hand_count, game_settings.hand_card_count)
   for card1 = 1, game_settings.card_count do

@@ -32,6 +32,10 @@ function ACPCGame:connect(server, port)
   end
 end
 
+--- Converts a string to state and node
+--
+-- @param msg string that represent the state
+-- @return state and corresponding node
 function ACPCGame:string_to_statenode(msg)
   local parsed_state = self.protocol_to_node:parse_state(msg)
   --current player to act is us
