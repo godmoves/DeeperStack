@@ -54,7 +54,7 @@ function RangeGenerator:_generate_sorted_range(range)
 end
 
 --- Sets the (possibly empty) board cards to sample ranges with.
--- 
+--
 -- The sampled ranges will assign 0 probability to any private hands that
 -- share any cards with the board.
 --
@@ -96,7 +96,7 @@ end
 -- Each vector is sampled indepently by randomly splitting the probability
 -- mass between the bottom half and the top half of the range, and then
 -- recursing on the two halfs.
--- 
+--
 -- @{set_board} must be called first.
 --
 -- @param range a NxK tensor in which to store the sampled ranges, where N is
