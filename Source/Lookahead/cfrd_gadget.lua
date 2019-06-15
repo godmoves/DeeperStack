@@ -17,26 +17,23 @@ local CFRDGadget = torch.class('CFRDGadget')
 -- @param opponent_cfvs the opponent counterfactual values vector used for re-solving
 function CFRDGadget:__init(board, player_range, opponent_cfvs)
   assert(board)
-  
+
 
   self.input_opponent_range = player_range:clone()
   self.input_opponent_value = opponent_cfvs:clone()
 
-  self.curent_opponent_values = arguments.Tensor(game_settings.card_count)
-  
-  self.regret_epsilon = 1.0/100000000
- 
-  --2 stands for 2 actions: play/terminate
-  self.opponent_reconstruction_regret = arguments.Tensor(2, game_settings.card_count)
+  self.curent_opponent_values = arguments.Tensor(game_settings.hand_count)
 
-  self.play_current_strategy = arguments.Tensor(game_settings.card_count):fill(0)
-  self.terminate_current_strategy = arguments.Tensor(game_settings.card_count):fill(1)
+  self.regret_epsilon = 1.0 / 100000000
+
+  self.play_current_strategy = arguments.Tensor(game_settings.hand_count):fill(0)
+  self.terminate_current_strategy = arguments.Tensor(game_settings.hand_count):fill(1)
 
   --holds achieved CFVs at each iteration so that we can compute regret
-  self.total_values = arguments.Tensor(game_settings.card_count)
+  self.total_values = arguments.Tensor(game_settings.hand_count)
 
-  self.terminate_regrets = arguments.Tensor(game_settings.card_count):fill(0)
-  self.play_regrets = arguments.Tensor(game_settings.card_count):fill(0)
+  self.terminate_regrets = arguments.Tensor(game_settings.hand_count):fill(0)
+  self.play_regrets = arguments.Tensor(game_settings.hand_count):fill(0)
 
   --init range mask for masking out impossible hands
   self.range_mask = card_tools:get_possible_hand_indexes(board)
@@ -53,7 +50,7 @@ function CFRDGadget:compute_opponent_range(current_opponent_cfvs, iteration)
   local play_values = current_opponent_cfvs
   local terminate_values = self.input_opponent_value
 
-  --1.0 compute current regrets  
+  --1.0 compute current regrets
   torch.cmul(self.total_values, play_values, self.play_current_strategy)
   self.total_values_p2 = self.total_values_p2 or self.total_values:clone():zero()
   torch.cmul(self.total_values_p2, terminate_values, self.terminate_current_strategy)
@@ -61,18 +58,18 @@ function CFRDGadget:compute_opponent_range(current_opponent_cfvs, iteration)
 
   self.play_current_regret = self.play_current_regret or play_values:clone():zero()
   self.terminate_current_regret = self.terminate_current_regret or self.play_current_regret:clone():zero()
-  
+
   self.play_current_regret:copy(play_values)
   self.play_current_regret:csub(self.total_values)
-  
+
   self.terminate_current_regret:copy(terminate_values)
   self.terminate_current_regret:csub(self.total_values)
 
   --1.1 cumulate regrets
   self.play_regrets:add(self.play_current_regret)
   self.terminate_regrets:add(self.terminate_current_regret)
-  
-  --2.0 we use cfr+ in reconstruction  
+
+  --2.0 we use cfr+ in reconstruction
   self.terminate_regrets:clamp(self.regret_epsilon, tools:max_number())
   self.play_regrets:clamp(self.regret_epsilon, tools:max_number())
 
@@ -89,7 +86,7 @@ function CFRDGadget:compute_opponent_range(current_opponent_cfvs, iteration)
 
   self.play_current_strategy:cdiv(self.regret_sum)
   self.terminate_current_strategy:cdiv(self.regret_sum)
-  
+
   --4.0 for poker, the range size is larger than the allowed hands
   --we need to make sure reconstruction does not choose a range
   --that is not allowed
@@ -97,7 +94,7 @@ function CFRDGadget:compute_opponent_range(current_opponent_cfvs, iteration)
   self.terminate_current_strategy:cmul(self.range_mask)
 
   self.input_opponent_range = self.input_opponent_range or self.play_current_strategy:clone():zero()
-  self.input_opponent_range:copy(self.play_current_strategy)  
+  self.input_opponent_range:copy(self.play_current_strategy)
 
   return self.input_opponent_range
 end
