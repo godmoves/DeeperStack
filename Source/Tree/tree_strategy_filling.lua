@@ -46,10 +46,10 @@ function TreeStrategyFilling:_fill_chance(node)
     --corresponding board
     node.strategy = arguments.Tensor(#node.children, game_settings.card_count):fill(0)
     --setting strategy for impossible hands to 0
-    for i = 1,#node.children do
+    for i = 1, #node.children do
       local child_node = node.children[i]
       local mask = card_tools:get_possible_hand_indexes(child_node.board):byte()
-      node.strategy[i][mask] = 1.0/(self.board_count - 2)
+      node.strategy[i][mask] = 1.0 / (self.board_count - 2)
     end
   end
 
@@ -76,7 +76,7 @@ function TreeStrategyFilling:_fill_uniformly(node, player)
     node.strategy = arguments.Tensor(#node.children, game_settings.card_count):fill(1.0 / #node.children)
   end
 
-  for i = 1,#node.children do
+  for i = 1, #node.children do
     local child_node = node.children[i]
     self:_fill_uniformly(child_node, player)
   end
@@ -99,7 +99,7 @@ function TreeStrategyFilling:_process_opponent_node(params)
   assert(not node.terminal and node.current_player ~= player)
   
   --when opponent plays, we will do nothing except sending cf_values to the child nodes
-  for i = 1,#node.children do
+  for i = 1, #node.children do
     local child_node = node.children[i]
     if not child_node.terminal then
       local child_params = {}
@@ -207,7 +207,7 @@ function TreeStrategyFilling:_fill_computed_node(node, player, range, resolving)
   --re-solving will be built from different node in the recursion
 
   --in first cycle, fill nodes we do not play in and fill strategies and cf-values
-  for i=1, actions_count do
+  for i = 1, actions_count do
     local child_node = node.children[i]
     --check if the bet is possible
     if used_bets[i] == 0 then
@@ -269,7 +269,7 @@ function TreeStrategyFilling:_process_chance_node(params)
   assert(our_last_action)
   assert(not node.terminal and node.current_player == constants.players.chance)
   --on chance node we need to recompute values in next round
-  for i = 1,#node.children do
+  for i = 1, #node.children do
     local child_node = node.children[i]
 
     assert(child_node.current_player == constants.players.P1)
