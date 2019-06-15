@@ -1,6 +1,4 @@
 --- Script that trains the neural network.
---
--- Uses data previously generated with @{data_generation_call}.
 -- @script main_train
 
 local nnBuilder = require 'Nn.net_builder'

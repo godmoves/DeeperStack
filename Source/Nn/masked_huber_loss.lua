@@ -27,7 +27,7 @@ end
 -- @param outputs an NxM tensor containing N vectors of values over buckets,
 -- output by the neural net
 -- @param targets an NxM tensor containing N vectors of actual values over
--- buckets, produced by @{data_generation_call}
+-- buckets
 -- @param mask an NxM tensor containing N mask vectors generated with
 -- @{bucket_conversion.get_possible_bucket_mask}
 -- @return the sum of Huber loss applied elementwise on `outputs` and `targets`,
@@ -75,7 +75,7 @@ end
 -- @param outputs an NxM tensor containing N vectors of values over buckets,
 -- output by the neural net
 -- @param targets an NxM tensor containing N vectors of actual values over
--- buckets, produced by @{data_generation_call}
+-- buckets
 -- @param mask an NxM tensor containing N mask vectors generated with
 -- @{bucket_conversion.get_possible_bucket_mask}
 -- @return the gradient of @{forward} applied to the arguments

@@ -39,8 +39,8 @@
 
 <h2>Modules</h2>
 <ul class="nowrap">
+  <li><a href="../modules/aux_data_generation.html">aux_data_generation</a></li>
   <li><a href="../modules/data_generation.html">data_generation</a></li>
-  <li><a href="../modules/data_generation_call.html">data_generation_call</a></li>
   <li><a href="../modules/random_card_generator.html">random_card_generator</a></li>
   <li><a href="../modules/evaluator.html">evaluator</a></li>
   <li><strong>card_to_string_conversion</strong></li>
@@ -57,7 +57,12 @@
   <li><a href="../scripts/main_data_generation.html">main_data_generation</a></li>
   <li><a href="../scripts/cpu_gpu_model_converter.html">cpu_gpu_model_converter</a></li>
   <li><a href="../scripts/deepstack.html">deepstack</a></li>
+  <li><a href="../scripts/deepstack_sever.html">deepstack_sever</a></li>
+  <li><a href="../scripts/manual_input_player.html">manual_input_player</a></li>
+  <li><a href="../scripts/manual_player.html">manual_player</a></li>
+  <li><a href="../scripts/secure_deepstack_server.html">secure_deepstack_server</a></li>
   <li><a href="../scripts/main_train.html">main_train</a></li>
+  <li><a href="../scripts/raw_converter.html">raw_converter</a></li>
 </ul>
 <h2>Classes</h2>
 <ul class="nowrap">
@@ -75,6 +80,7 @@
   <li><a href="../classes/bucketer.html">bucketer</a></li>
   <li><a href="../classes/masked_huber_loss.html">masked_huber_loss</a></li>
   <li><a href="../classes/mock_nn_terminal.html">mock_nn_terminal</a></li>
+  <li><a href="../classes/next_round_value.html">next_round_value</a></li>
   <li><a href="../classes/next_round_value.html">next_round_value</a></li>
   <li><a href="../classes/value_nn.html">value_nn</a></li>
   <li><a href="../classes/continual_resolving.html">continual_resolving</a></li>
@@ -129,7 +135,7 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#string_to_board">string_to_board (card_string)</a></td>
-	<td class="summary">Converts a string representing zero or one board cards to a
+	<td class="summary">Converts a string representing zero or more board cards to a
  vector of numeric representations.</td>
 	</tr>
 </table>
@@ -137,12 +143,11 @@
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#suit_table">suit_table</a></td>
-	<td class="summary">All possible card suits - only the first 2 are used in Leduc Hold'em.</td>
+	<td class="summary">All possible card suits</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#rank_table">rank_table</a></td>
-	<td class="summary">All possible card ranks - only the first 3-4 are used in Leduc Hold'em and
- variants.</td>
+	<td class="summary">All possible card ranks</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#card_to_string_table">card_to_string_table</a></td>
@@ -294,7 +299,7 @@
     <strong>string_to_board (card_string)</strong>
     </dt>
     <dd>
-    Converts a string representing zero or one board cards to a
+    Converts a string representing zero or more board cards to a
  vector of numeric representations.
 
 
@@ -326,27 +331,27 @@
     <strong>suit_table</strong>
     </dt>
     <dd>
-    All possible card suits - only the first 2 are used in Leduc Hold'em.
+    All possible card suits
 
 
     <h3>Fields:</h3>
     <ul>
-        <li><span class="parameter">h</span>
-
-
-
-        </li>
-        <li><span class="parameter">s</span>
-
-
-
-        </li>
         <li><span class="parameter">c</span>
 
 
 
         </li>
         <li><span class="parameter">d</span>
+
+
+
+        </li>
+        <li><span class="parameter">h</span>
+
+
+
+        </li>
+        <li><span class="parameter">s</span>
 
 
 
@@ -363,63 +368,12 @@
     <strong>rank_table</strong>
     </dt>
     <dd>
-    All possible card ranks - only the first 3-4 are used in Leduc Hold'em and
- variants.
+    All possible card ranks
 
 
     <h3>Fields:</h3>
     <ul>
-        <li><span class="parameter">A</span>
-
-
-
-        </li>
-        <li><span class="parameter">K</span>
-
-
-
-        </li>
-        <li><span class="parameter">Q</span>
-
-
-
-        </li>
-        <li><span class="parameter">J</span>
-
-
-
-        </li>
-        <li><span class="parameter">T</span>
-
-
-
-        </li>
-        <li><span class="parameter">9</span>
-
-
-
-        </li>
-        <li><span class="parameter">8</span>
-
-
-
-        </li>
-        <li><span class="parameter">7</span>
-
-
-
-        </li>
-        <li><span class="parameter">6</span>
-
-
-
-        </li>
-        <li><span class="parameter">5</span>
-
-
-
-        </li>
-        <li><span class="parameter">4</span>
+        <li><span class="parameter">2</span>
 
 
 
@@ -429,7 +383,57 @@
 
 
         </li>
-        <li><span class="parameter">2</span>
+        <li><span class="parameter">4</span>
+
+
+
+        </li>
+        <li><span class="parameter">5</span>
+
+
+
+        </li>
+        <li><span class="parameter">6</span>
+
+
+
+        </li>
+        <li><span class="parameter">7</span>
+
+
+
+        </li>
+        <li><span class="parameter">8</span>
+
+
+
+        </li>
+        <li><span class="parameter">9</span>
+
+
+
+        </li>
+        <li><span class="parameter">T</span>
+
+
+
+        </li>
+        <li><span class="parameter">J</span>
+
+
+
+        </li>
+        <li><span class="parameter">Q</span>
+
+
+
+        </li>
+        <li><span class="parameter">K</span>
+
+
+
+        </li>
+        <li><span class="parameter">A</span>
 
 
 
@@ -478,7 +482,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2017-04-04 17:03:20 </i>
+<i style="float:right;">Last updated 2019-06-15 16:40:00 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

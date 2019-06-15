@@ -23,8 +23,7 @@ end
 
 --- Constructor.
 --
--- Reads the data from training and validation files generated with
--- @{data_generation_call.generate_data}.
+-- @param street current street we are playing
 function DataStream:__init(street)
   self.folder = "xxx/"
   if street == 4 then
@@ -181,9 +180,6 @@ function DataStream:start_epoch()
 end
 
 --- Returns a batch of data from a specified data set.
--- @param inputs the inputs set for the given data set
--- @param targets the targets set for the given data set
--- @param mask the masks set for the given data set
 -- @param batch_index the index of the batch to return
 -- @return the inputs set for the batch
 -- @return the targets set for the batch

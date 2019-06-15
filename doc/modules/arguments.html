@@ -39,8 +39,8 @@
 
 <h2>Modules</h2>
 <ul class="nowrap">
+  <li><a href="../modules/aux_data_generation.html">aux_data_generation</a></li>
   <li><a href="../modules/data_generation.html">data_generation</a></li>
-  <li><a href="../modules/data_generation_call.html">data_generation_call</a></li>
   <li><a href="../modules/random_card_generator.html">random_card_generator</a></li>
   <li><a href="../modules/evaluator.html">evaluator</a></li>
   <li><a href="../modules/card_to_string_conversion.html">card_to_string_conversion</a></li>
@@ -57,7 +57,12 @@
   <li><a href="../scripts/main_data_generation.html">main_data_generation</a></li>
   <li><a href="../scripts/cpu_gpu_model_converter.html">cpu_gpu_model_converter</a></li>
   <li><a href="../scripts/deepstack.html">deepstack</a></li>
+  <li><a href="../scripts/deepstack_sever.html">deepstack_sever</a></li>
+  <li><a href="../scripts/manual_input_player.html">manual_input_player</a></li>
+  <li><a href="../scripts/manual_player.html">manual_player</a></li>
+  <li><a href="../scripts/secure_deepstack_server.html">secure_deepstack_server</a></li>
   <li><a href="../scripts/main_train.html">main_train</a></li>
+  <li><a href="../scripts/raw_converter.html">raw_converter</a></li>
 </ul>
 <h2>Classes</h2>
 <ul class="nowrap">
@@ -75,6 +80,7 @@
   <li><a href="../classes/bucketer.html">bucketer</a></li>
   <li><a href="../classes/masked_huber_loss.html">masked_huber_loss</a></li>
   <li><a href="../classes/mock_nn_terminal.html">mock_nn_terminal</a></li>
+  <li><a href="../classes/next_round_value.html">next_round_value</a></li>
   <li><a href="../classes/next_round_value.html">next_round_value</a></li>
   <li><a href="../classes/value_nn.html">value_nn</a></li>
   <li><a href="../classes/continual_resolving.html">continual_resolving</a></li>
@@ -108,11 +114,15 @@
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#params.bet_sizing">params.bet_sizing</a></td>
-	<td class="summary">list of pot-scaled bet sizes to use in tree</td>
+	<td class="summary">list of pot-scaled bet sizes to use in tree, for flop/turn/river.</td>
 	</tr>
 </table>
 <h2><a href="#Fields">Fields</a></h2>
 <table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#params.cache_boards">params.cache_boards</a></td>
+	<td class="summary">cache board buckets for faster loading</td>
+	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#params.gpu">params.gpu</a></td>
 	<td class="summary">whether to run on GPU</td>
@@ -126,10 +136,6 @@
 	<td class="summary">server port running the ACPC dealer</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#params.streets_count">params.streets_count</a></td>
-	<td class="summary">the number of betting rounds in the game</td>
-	</tr>
-	<tr>
 	<td class="name" nowrap><a href="#params.Tensor">params.Tensor</a></td>
 	<td class="summary">the tensor datatype used for storing DeepStack's internal data</td>
 	</tr>
@@ -139,7 +145,7 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#params.ante">params.ante</a></td>
-	<td class="summary">the size of the game's ante, in chips</td>
+	<td class="summary">the size of the game's ante/small blind/big blind, in chips</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#params.stack">params.stack</a></td>
@@ -175,7 +181,7 @@
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#params.net">params.net</a></td>
-	<td class="summary">the neural net architecture</td>
+	<td class="summary">the neural net architecture, use 3 layers by default.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#params.save_epoch">params.save_epoch</a></td>
@@ -190,12 +196,12 @@
 	<td class="summary">how many solved poker situations are generated for use as training examples</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#params.valid_data_count">params.valid_data_count</a></td>
-	<td class="summary">how many solved poker situations are generated for use as validation examples</td>
-	</tr>
-	<tr>
 	<td class="name" nowrap><a href="#params.learning_rate">params.learning_rate</a></td>
 	<td class="summary">learning rate for neural net training</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#params.decrease_learning_at_epoch">params.decrease_learning_at_epoch</a></td>
+	<td class="summary">how epochs are needed to decrease learning<em>rate to learning</em>rate / 10</td>
 	</tr>
 </table>
 
@@ -211,9 +217,17 @@
     <strong>params.bet_sizing</strong>
     </dt>
     <dd>
-    list of pot-scaled bet sizes to use in tree
+    list of pot-scaled bet sizes to use in tree, for flop/turn/river.
 
 
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">{</span>
+
+
+
+        </li>
+    </ul>
 
 
 
@@ -224,6 +238,20 @@
     <h2 class="section-header "><a name="Fields"></a>Fields</h2>
 
     <dl class="function">
+    <dt>
+    <a name = "params.cache_boards"></a>
+    <strong>params.cache_boards</strong>
+    </dt>
+    <dd>
+    cache board buckets for faster loading
+
+
+
+
+
+
+
+</dd>
     <dt>
     <a name = "params.gpu"></a>
     <strong>params.gpu</strong>
@@ -267,20 +295,6 @@
 
 </dd>
     <dt>
-    <a name = "params.streets_count"></a>
-    <strong>params.streets_count</strong>
-    </dt>
-    <dd>
-    the number of betting rounds in the game
-
-
-
-
-
-
-
-</dd>
-    <dt>
     <a name = "params.Tensor"></a>
     <strong>params.Tensor</strong>
     </dt>
@@ -313,7 +327,7 @@
     <strong>params.ante</strong>
     </dt>
     <dd>
-    the size of the game's ante, in chips
+    the size of the game's ante/small blind/big blind, in chips
 
 
 
@@ -439,7 +453,7 @@
     <strong>params.net</strong>
     </dt>
     <dd>
-    the neural net architecture
+    the neural net architecture, use 3 layers by default.
 
 
 
@@ -491,11 +505,11 @@
 
 </dd>
     <dt>
-    <a name = "params.valid_data_count"></a>
-    <strong>params.valid_data_count</strong>
+    <a name = "params.learning_rate"></a>
+    <strong>params.learning_rate</strong>
     </dt>
     <dd>
-    how many solved poker situations are generated for use as validation examples
+    learning rate for neural net training
 
 
 
@@ -505,11 +519,11 @@
 
 </dd>
     <dt>
-    <a name = "params.learning_rate"></a>
-    <strong>params.learning_rate</strong>
+    <a name = "params.decrease_learning_at_epoch"></a>
+    <strong>params.decrease_learning_at_epoch</strong>
     </dt>
     <dd>
-    learning rate for neural net training
+    how epochs are needed to decrease learning<em>rate to learning</em>rate / 10
 
 
 
@@ -525,7 +539,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2017-04-04 17:03:20 </i>
+<i style="float:right;">Last updated 2019-06-15 16:40:00 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

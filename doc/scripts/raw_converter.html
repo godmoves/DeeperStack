@@ -36,21 +36,6 @@
 </ul>
 
 
-<h2>Modules</h2>
-<ul class="nowrap">
-  <li><a href="../modules/aux_data_generation.html">aux_data_generation</a></li>
-  <li><a href="../modules/data_generation.html">data_generation</a></li>
-  <li><a href="../modules/random_card_generator.html">random_card_generator</a></li>
-  <li><strong>evaluator</strong></li>
-  <li><a href="../modules/card_to_string_conversion.html">card_to_string_conversion</a></li>
-  <li><a href="../modules/card_tools.html">card_tools</a></li>
-  <li><a href="../modules/net_builder.html">net_builder</a></li>
-  <li><a href="../modules/arguments.html">arguments</a></li>
-  <li><a href="../modules/constants.html">constants</a></li>
-  <li><a href="../modules/game_settings.html">game_settings</a></li>
-  <li><a href="../modules/train.html">train</a></li>
-  <li><a href="../modules/tools.html">tools</a></li>
-</ul>
 <h2>Scripts</h2>
 <ul class="nowrap">
   <li><a href="../scripts/main_data_generation.html">main_data_generation</a></li>
@@ -61,7 +46,22 @@
   <li><a href="../scripts/manual_player.html">manual_player</a></li>
   <li><a href="../scripts/secure_deepstack_server.html">secure_deepstack_server</a></li>
   <li><a href="../scripts/main_train.html">main_train</a></li>
-  <li><a href="../scripts/raw_converter.html">raw_converter</a></li>
+  <li><strong>raw_converter</strong></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/aux_data_generation.html">aux_data_generation</a></li>
+  <li><a href="../modules/data_generation.html">data_generation</a></li>
+  <li><a href="../modules/random_card_generator.html">random_card_generator</a></li>
+  <li><a href="../modules/evaluator.html">evaluator</a></li>
+  <li><a href="../modules/card_to_string_conversion.html">card_to_string_conversion</a></li>
+  <li><a href="../modules/card_tools.html">card_tools</a></li>
+  <li><a href="../modules/net_builder.html">net_builder</a></li>
+  <li><a href="../modules/arguments.html">arguments</a></li>
+  <li><a href="../modules/constants.html">constants</a></li>
+  <li><a href="../modules/game_settings.html">game_settings</a></li>
+  <li><a href="../modules/train.html">train</a></li>
+  <li><a href="../modules/tools.html">tools</a></li>
 </ul>
 <h2>Classes</h2>
 <ul class="nowrap">
@@ -102,37 +102,22 @@
 
 <div id="content">
 
-<h1>Module <code>evaluator</code></h1>
-<p>Evaluates hand strength in Leduc Hold'em and variants.</p>
-<p> Works with hands which contain two or three cards, but assumes that
- the deck contains no more than two cards of each rank (so three-of-a-kind
- is not a possible hand).</p>
+<h1>Script <code>raw_converter</code></h1>
+<p>Script that convert raw training data to bucket.</p>
+<p>
 
-<p> Hand strength is given as a numerical value, where a lower strength means
- a stronger hand: high pair &lt; low pair &lt; high card &lt; low card</p>
+</p>
 
 
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#_init">_init ()</a></td>
-	<td class="summary">Constructor</td>
+	<td class="name" nowrap><a href="#scandir">scandir (directory)</a></td>
+	<td class="summary">Lua implementation of PHP scandir function</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#evaluate">evaluate (hand[, impossible_hand_value])</a></td>
-	<td class="summary">Gives a strength representation for a two or three card hand.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#evaluate_fast">evaluate_fast (hands)</a></td>
-	<td class="summary">Fast hand strength evaluation</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#batch_eval">batch_eval (board, impossible_hand_value)</a></td>
-	<td class="summary">Gives strength representations for all private hands on the given board.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#batch_eval_fast">batch_eval_fast (board)</a></td>
-	<td class="summary">Gives fast strength representations for all private hands on the given board.</td>
+	<td class="name" nowrap><a href="#convert">convert (street)</a></td>
+	<td class="summary">Converts raw training data to bucket data</td>
 	</tr>
 </table>
 
@@ -144,13 +129,19 @@
 
     <dl class="function">
     <dt>
-    <a name = "_init"></a>
-    <strong>_init ()</strong>
+    <a name = "scandir"></a>
+    <strong>scandir (directory)</strong>
     </dt>
     <dd>
-    Constructor
+    Lua implementation of PHP scandir function
 
 
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">directory</span>
+         directory to scan
+        </li>
+    </ul>
 
 
 
@@ -158,110 +149,20 @@
 
 </dd>
     <dt>
-    <a name = "evaluate"></a>
-    <strong>evaluate (hand[, impossible_hand_value])</strong>
+    <a name = "convert"></a>
+    <strong>convert (street)</strong>
     </dt>
     <dd>
-    Gives a strength representation for a two or three card hand.
+    Converts raw training data to bucket data
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">hand</span>
-         a vector of two or three cards
-        </li>
-        <li><span class="parameter">impossible_hand_value</span>
-         the value to return if the hand is invalid
-         (<em>optional</em>)
+        <li><span class="parameter">street</span>
+         which street the data is
         </li>
     </ul>
 
-    <h3>Returns:</h3>
-    <ol>
-
-        the strength value of the hand, or <code>impossible_hand_value</code> if the
- hand is invalid
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "evaluate_fast"></a>
-    <strong>evaluate_fast (hands)</strong>
-    </dt>
-    <dd>
-    Fast hand strength evaluation
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">hands</span>
-         several hands of cards
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-        the strength value of the hand
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "batch_eval"></a>
-    <strong>batch_eval (board, impossible_hand_value)</strong>
-    </dt>
-    <dd>
-    Gives strength representations for all private hands on the given board.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">board</span>
-         a possibly empty vector of board cards
-        </li>
-        <li><span class="parameter">impossible_hand_value</span>
-         the value to assign to hands which are invalid
- on the board
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-        a vector containing a strength value or <code>impossible_hand_value</code> for
- every private hand
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "batch_eval_fast"></a>
-    <strong>batch_eval_fast (board)</strong>
-    </dt>
-    <dd>
-    Gives fast strength representations for all private hands on the given board.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">board</span>
-         a possibly empty vector of board cards
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-        a vector containing a strength value
-    </ol>
 
 
 

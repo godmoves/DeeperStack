@@ -38,8 +38,8 @@
 
 <h2>Modules</h2>
 <ul class="nowrap">
+  <li><a href="../modules/aux_data_generation.html">aux_data_generation</a></li>
   <li><a href="../modules/data_generation.html">data_generation</a></li>
-  <li><a href="../modules/data_generation_call.html">data_generation_call</a></li>
   <li><a href="../modules/random_card_generator.html">random_card_generator</a></li>
   <li><a href="../modules/evaluator.html">evaluator</a></li>
   <li><a href="../modules/card_to_string_conversion.html">card_to_string_conversion</a></li>
@@ -56,7 +56,12 @@
   <li><a href="../scripts/main_data_generation.html">main_data_generation</a></li>
   <li><a href="../scripts/cpu_gpu_model_converter.html">cpu_gpu_model_converter</a></li>
   <li><a href="../scripts/deepstack.html">deepstack</a></li>
+  <li><a href="../scripts/deepstack_sever.html">deepstack_sever</a></li>
+  <li><a href="../scripts/manual_input_player.html">manual_input_player</a></li>
+  <li><a href="../scripts/manual_player.html">manual_player</a></li>
+  <li><a href="../scripts/secure_deepstack_server.html">secure_deepstack_server</a></li>
   <li><a href="../scripts/main_train.html">main_train</a></li>
+  <li><a href="../scripts/raw_converter.html">raw_converter</a></li>
 </ul>
 <h2>Classes</h2>
 <ul class="nowrap">
@@ -74,6 +79,7 @@
   <li><a href="../classes/bucketer.html">bucketer</a></li>
   <li><a href="../classes/masked_huber_loss.html">masked_huber_loss</a></li>
   <li><a href="../classes/mock_nn_terminal.html">mock_nn_terminal</a></li>
+  <li><a href="../classes/next_round_value.html">next_round_value</a></li>
   <li><a href="../classes/next_round_value.html">next_round_value</a></li>
   <li><a href="../classes/value_nn.html">value_nn</a></li>
   <li><a href="../classes/continual_resolving.html">continual_resolving</a></li>
@@ -110,6 +116,10 @@
 	<td class="summary">Gives whether a set of cards is valid.</td>
 	</tr>
 	<tr>
+	<td class="name" nowrap><a href="#get_possible_hands_mask">get_possible_hands_mask (hands)</a></td>
+	<td class="summary">Gives the possible hands mask</td>
+	</tr>
+	<tr>
 	<td class="name" nowrap><a href="#get_possible_hand_indexes">get_possible_hand_indexes (board)</a></td>
 	<td class="summary">Gives the private hands which are valid with a given board.</td>
 	</tr>
@@ -121,6 +131,10 @@
 	<td class="name" nowrap><a href="#get_uniform_range">get_uniform_range (board)</a></td>
 	<td class="summary">Gives a range vector that has uniform probability on each hand which is
  valid with a given board.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_file_range">get_file_range (filename)</a></td>
+	<td class="summary">Read a range from a file</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#get_random_range">get_random_range (board[, seed])</a></td>
@@ -135,16 +149,36 @@
 	<td class="summary">Gives the current betting round based on a board vector.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#get_second_round_boards">get_second_round_boards ()</a></td>
+	<td class="name" nowrap><a href="#get_next_round_boards">get_next_round_boards (board)</a></td>
 	<td class="summary">Gives all possible sets of board cards for the game.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#get_boards_count">get_boards_count ()</a></td>
+	<td class="name" nowrap><a href="#get_last_round_boards">get_last_round_boards (board)</a></td>
+	<td class="summary">Gives all possible sets of board cards for the game.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_next_boards_count">get_next_boards_count (street)</a></td>
+	<td class="summary">Gives the number of possible boards.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_last_boards_count">get_last_boards_count (street)</a></td>
 	<td class="summary">Gives the number of possible boards.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#get_board_index">get_board_index (board)</a></td>
 	<td class="summary">Gives a numerical index for a set of board cards.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_flop_board_index">get_flop_board_index (board)</a></td>
+	<td class="summary">Gives a numerical index for a set of board cards.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_hole_index">get_hole_index (hand)</a></td>
+	<td class="summary">Gives a numerical index for a set of hole cards.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#string_to_hole_index">string_to_hole_index (hand_string)</a></td>
+	<td class="summary">Gives a numerical index for a set of hole cards.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#normalize_range">normalize_range (board, range)</a></td>
@@ -185,6 +219,31 @@
 
 </dd>
     <dt>
+    <a name = "get_possible_hands_mask"></a>
+    <strong>get_possible_hands_mask (hands)</strong>
+    </dt>
+    <dd>
+    Gives the possible hands mask
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">hands</span>
+         several hands of cards
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        possible hands mask
+    </ol>
+
+
+
+
+</dd>
+    <dt>
     <a name = "get_possible_hand_indexes"></a>
     <strong>get_possible_hand_indexes (board)</strong>
     </dt>
@@ -202,8 +261,9 @@
     <h3>Returns:</h3>
     <ol>
 
-        a vector with an entry for every possible hand (private card), which
-  is <code>1</code> if the hand shares no cards with the board and <code>0</code> otherwise
+         a vector with an entry for every possible hand (private card), which
+ is <code>1</code> if the hand shares no cards with the board and <code>0</code> otherwise
+ TODO generalize
     </ol>
 
 
@@ -257,6 +317,31 @@
 
         a range vector where invalid hands have 0 probability and valid
  hands have uniform probability
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_file_range"></a>
+    <strong>get_file_range (filename)</strong>
+    </dt>
+    <dd>
+    Read a range from a file
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">filename</span>
+         name of the file to read
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        range according to the file
     </ol>
 
 
@@ -349,13 +434,21 @@
 
 </dd>
     <dt>
-    <a name = "get_second_round_boards"></a>
-    <strong>get_second_round_boards ()</strong>
+    <a name = "get_next_round_boards"></a>
+    <strong>get_next_round_boards (board)</strong>
     </dt>
     <dd>
     Gives all possible sets of board cards for the game.
 
 
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">board</span>
+
+
+
+        </li>
+    </ul>
 
     <h3>Returns:</h3>
     <ol>
@@ -369,13 +462,76 @@
 
 </dd>
     <dt>
-    <a name = "get_boards_count"></a>
-    <strong>get_boards_count ()</strong>
+    <a name = "get_last_round_boards"></a>
+    <strong>get_last_round_boards (board)</strong>
+    </dt>
+    <dd>
+    Gives all possible sets of board cards for the game.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">board</span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        an NxK tensor, where N is the number of possible boards, and K is
+ the number of cards on each board
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_next_boards_count"></a>
+    <strong>get_next_boards_count (street)</strong>
     </dt>
     <dd>
     Gives the number of possible boards.
 
 
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">street</span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        the number of possible boards
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_last_boards_count"></a>
+    <strong>get_last_boards_count (street)</strong>
+    </dt>
+    <dd>
+    Gives the number of possible boards.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">street</span>
+
+
+
+        </li>
+    </ul>
 
     <h3>Returns:</h3>
     <ol>
@@ -406,6 +562,81 @@
     <ol>
 
         the numerical index for the board
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_flop_board_index"></a>
+    <strong>get_flop_board_index (board)</strong>
+    </dt>
+    <dd>
+    Gives a numerical index for a set of board cards.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">board</span>
+         a non-empty vector of board cards
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        the numerical index for the board
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_hole_index"></a>
+    <strong>get_hole_index (hand)</strong>
+    </dt>
+    <dd>
+    Gives a numerical index for a set of hole cards.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">hand</span>
+         a non-empty vector of hole cards, sorted
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        the numerical index for the hand
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "string_to_hole_index"></a>
+    <strong>string_to_hole_index (hand_string)</strong>
+    </dt>
+    <dd>
+    Gives a numerical index for a set of hole cards.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">hand_string</span>
+         string that represents a hand
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        the numerical index for the hand
     </ol>
 
 
@@ -448,7 +679,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2017-04-04 17:03:20 </i>
+<i style="float:right;">Last updated 2019-06-15 16:40:00 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

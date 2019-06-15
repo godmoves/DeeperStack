@@ -33,6 +33,7 @@
 <h2>Contents</h2>
 <ul>
 <li><a href="#Functions">Functions</a></li>
+<li><a href="#Methods">Methods</a></li>
 </ul>
 
 
@@ -53,6 +54,7 @@
   <li><a href="../classes/masked_huber_loss.html">masked_huber_loss</a></li>
   <li><a href="../classes/mock_nn_terminal.html">mock_nn_terminal</a></li>
   <li><strong>next_round_value</strong></li>
+  <li><strong>next_round_value</strong></li>
   <li><a href="../classes/value_nn.html">value_nn</a></li>
   <li><a href="../classes/continual_resolving.html">continual_resolving</a></li>
   <li><a href="../classes/terminal_equity.html">terminal_equity</a></li>
@@ -66,8 +68,8 @@
 </ul>
 <h2>Modules</h2>
 <ul class="nowrap">
+  <li><a href="../modules/aux_data_generation.html">aux_data_generation</a></li>
   <li><a href="../modules/data_generation.html">data_generation</a></li>
-  <li><a href="../modules/data_generation_call.html">data_generation_call</a></li>
   <li><a href="../modules/random_card_generator.html">random_card_generator</a></li>
   <li><a href="../modules/evaluator.html">evaluator</a></li>
   <li><a href="../modules/card_to_string_conversion.html">card_to_string_conversion</a></li>
@@ -84,7 +86,12 @@
   <li><a href="../scripts/main_data_generation.html">main_data_generation</a></li>
   <li><a href="../scripts/cpu_gpu_model_converter.html">cpu_gpu_model_converter</a></li>
   <li><a href="../scripts/deepstack.html">deepstack</a></li>
+  <li><a href="../scripts/deepstack_sever.html">deepstack_sever</a></li>
+  <li><a href="../scripts/manual_input_player.html">manual_input_player</a></li>
+  <li><a href="../scripts/manual_player.html">manual_player</a></li>
+  <li><a href="../scripts/secure_deepstack_server.html">secure_deepstack_server</a></li>
   <li><a href="../scripts/main_train.html">main_train</a></li>
+  <li><a href="../scripts/raw_converter.html">raw_converter</a></li>
 </ul>
 <h2>Manual</h2>
 <ul class="nowrap">
@@ -106,23 +113,35 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#NextRoundValue:__init">NextRoundValue:__init (nn)</a></td>
+	<td class="name" nowrap><a href="#NextRoundValuePre:__init">NextRoundValuePre:__init (nn, aux_nn, board)</a></td>
 	<td class="summary">Constructor.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#NextRoundValue:start_computation">NextRoundValue:start_computation (pot_sizes)</a></td>
+	<td class="name" nowrap><a href="#NextRoundValuePre:start_computation">NextRoundValuePre:start_computation (pot_sizes, batch_size)</a></td>
 	<td class="summary">Initializes the value calculator with the pot size of each state that
  we are going to evaluate.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#NextRoundValue:get_value">NextRoundValue:get_value (ranges, values)</a></td>
+	<td class="name" nowrap><a href="#NextRoundValuePre:get_value_aux">NextRoundValuePre:get_value_aux (ranges, values, next_board_idx)</a></td>
+	<td class="summary">Gives the predicted counterfactual values at each evaluated state for
+ aux round, given input ranges.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#NextRoundValuePre:get_value">NextRoundValuePre:get_value (ranges, values)</a></td>
 	<td class="summary">Gives the predicted counterfactual values at each evaluated state, given
  input ranges.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#NextRoundValue:get_value_on_board">NextRoundValue:get_value_on_board (board, values)</a></td>
+	<td class="name" nowrap><a href="#NextRoundValuePre:get_value_on_board">NextRoundValuePre:get_value_on_board (board, values)</a></td>
 	<td class="summary">Gives the average counterfactual values on the given board across previous
- calls to <a href="../classes/next_round_value.html#NextRoundValue:get_value">get_value</a>.</td>
+ calls to <a href="../classes/next_round_value.html#NextRoundValuePre:get_value">get_value</a>.</td>
+	</tr>
+</table>
+<h2><a href="#Methods">Methods</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#next_round_value:file_exists">next_round_value:file_exists (name)</a></td>
+	<td class="summary">Return if a target file exists</td>
 	</tr>
 </table>
 
@@ -134,8 +153,8 @@
 
     <dl class="function">
     <dt>
-    <a name = "NextRoundValue:__init"></a>
-    <strong>NextRoundValue:__init (nn)</strong>
+    <a name = "NextRoundValuePre:__init"></a>
+    <strong>NextRoundValuePre:__init (nn, aux_nn, board)</strong>
     </dt>
     <dd>
     Constructor. </p>
@@ -149,6 +168,12 @@
         <li><span class="parameter">nn</span>
          the neural network
         </li>
+        <li><span class="parameter">aux_nn</span>
+         aux neural network for preflop
+        </li>
+        <li><span class="parameter">board</span>
+         current board
+        </li>
     </ul>
 
 
@@ -157,8 +182,8 @@
 
 </dd>
     <dt>
-    <a name = "NextRoundValue:start_computation"></a>
-    <strong>NextRoundValue:start_computation (pot_sizes)</strong>
+    <a name = "NextRoundValuePre:start_computation"></a>
+    <strong>NextRoundValuePre:start_computation (pot_sizes, batch_size)</strong>
     </dt>
     <dd>
     Initializes the value calculator with the pot size of each state that
@@ -172,6 +197,9 @@
     <ul>
         <li><span class="parameter">pot_sizes</span>
          a vector of pot sizes
+        </li>
+        <li><span class="parameter">batch_size</span>
+         batch size
  betting round ends
         </li>
     </ul>
@@ -182,14 +210,14 @@
 
 </dd>
     <dt>
-    <a name = "NextRoundValue:get_value"></a>
-    <strong>NextRoundValue:get_value (ranges, values)</strong>
+    <a name = "NextRoundValuePre:get_value_aux"></a>
+    <strong>NextRoundValuePre:get_value_aux (ranges, values, next_board_idx)</strong>
     </dt>
     <dd>
-    Gives the predicted counterfactual values at each evaluated state, given
- input ranges. </p>
+    Gives the predicted counterfactual values at each evaluated state for
+ aux round, given input ranges. </p>
 
-<p> <a href="../classes/next_round_value.html#NextRoundValue:start_computation">start_computation</a> must be called first. Each state to be evaluated must
+<p> <a href="../classes/next_round_value.html#NextRoundValuePre:start_computation">start_computation</a> must be called first. Each state to be evaluated must
  be given in the same order that pot sizes were given for that function.
  Keeps track of iterations internally, so should be called exactly once for
  every iteration of continual re-solving.
@@ -199,7 +227,42 @@
     <ul>
         <li><span class="parameter">ranges</span>
          An Nx2xK tensor, where N is the number of states evaluated
- (must match input to <a href="../classes/next_round_value.html#NextRoundValue:start_computation">start_computation</a>), 2 is the number of players, and
+ (must match input to <a href="../classes/next_round_value.html#NextRoundValuePre:start_computation">start_computation</a>), 2 is the number of players, and
+ K is the number of private hands. Contains N sets of 2 range vectors.
+        </li>
+        <li><span class="parameter">values</span>
+         an Nx2xK tensor in which to store the N sets of 2 value vectors
+ which are output
+        </li>
+        <li><span class="parameter">next_board_idx</span>
+         index of next board
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "NextRoundValuePre:get_value"></a>
+    <strong>NextRoundValuePre:get_value (ranges, values)</strong>
+    </dt>
+    <dd>
+    Gives the predicted counterfactual values at each evaluated state, given
+ input ranges. </p>
+
+<p> <a href="../classes/next_round_value.html#NextRoundValuePre:start_computation">start_computation</a> must be called first. Each state to be evaluated must
+ be given in the same order that pot sizes were given for that function.
+ Keeps track of iterations internally, so should be called exactly once for
+ every iteration of continual re-solving.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ranges</span>
+         An Nx2xK tensor, where N is the number of states evaluated
+ (must match input to <a href="../classes/next_round_value.html#NextRoundValuePre:start_computation">start_computation</a>), 2 is the number of players, and
  K is the number of private hands. Contains N sets of 2 range vectors.
         </li>
         <li><span class="parameter">values</span>
@@ -214,12 +277,12 @@
 
 </dd>
     <dt>
-    <a name = "NextRoundValue:get_value_on_board"></a>
-    <strong>NextRoundValue:get_value_on_board (board, values)</strong>
+    <a name = "NextRoundValuePre:get_value_on_board"></a>
+    <strong>NextRoundValuePre:get_value_on_board (board, values)</strong>
     </dt>
     <dd>
     Gives the average counterfactual values on the given board across previous
- calls to <a href="../classes/next_round_value.html#NextRoundValue:get_value">get_value</a>. </p>
+ calls to <a href="../classes/next_round_value.html#NextRoundValuePre:get_value">get_value</a>. </p>
 
 <p> Used to update opponent counterfactual values during re-solving after board
  cards are dealt.
@@ -241,13 +304,42 @@
 
 </dd>
 </dl>
+    <h2 class="section-header "><a name="Methods"></a>Methods</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "next_round_value:file_exists"></a>
+    <strong>next_round_value:file_exists (name)</strong>
+    </dt>
+    <dd>
+    Return if a target file exists
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+         name of the file we want to find
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        true if file exists else false
+    </ol>
+
+
+
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2017-04-04 17:03:20 </i>
+<i style="float:right;">Last updated 2019-06-15 16:40:00 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
