@@ -17,6 +17,7 @@ end
 
 --- Sets the board cards for the bucketer.
 -- @param board a non-empty vector of board cards
+-- @param raw if we are using raw data
 function BucketConversion:set_board(board, raw)
   if raw ~= nil then
     self.bucket_count = tools:choose(14, 2) + tools:choose(10, 2)
@@ -72,7 +73,7 @@ end
 -- @param card_range a probability vector over private hands
 -- @param card_cfvs a vector of cfvs achieved by the cards
 -- @param bucket_range a probability vector over bucket
--- @param bucket_cfvs a vector in which to save the resulting cfvs 
+-- @param bucketed_cfvs a vector in which to save the resulting cfvs 
 function BucketConversion:hand_cfvs_to_bucket_cfvs(card_range, card_cfvs, bucket_range, bucketed_cfvs)
   if arguments.gpu then
     card_range = card_range:cuda()

@@ -1,3 +1,5 @@
+--- Flop tools
+
 local M = {}
 
 function M:_suitcat_flop(s1,s2,s3,s4,s5)

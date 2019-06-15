@@ -12,7 +12,6 @@ params.cache_boards = true
 --- whether to run on GPU
 params.gpu = false
 --- list of pot-scaled bet sizes to use in tree, for flop/turn/river.
--- @field params.bet_sizing
 params.bet_sizing = {{1},{1},{1}}
 --- server running the ACPC dealer
 params.acpc_server = "localhost"

@@ -58,6 +58,7 @@ end
 -- The sampled ranges will assign 0 probability to any private hands that
 -- share any cards with the board.
 --
+-- @param player terminal equities evaluator
 -- @param board a possibly empty vector of board cards
 function RangeGenerator:set_board(te, board)
 

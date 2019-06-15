@@ -94,7 +94,7 @@ function M:evaluate_three_card_hand(hand_ranks)
 end
 
 --- Gives a strength representation for a texas hold'em hand containing seven cards.
--- @param hand_ranks the rank of each card in the hand
+-- @param hand the card in the hand
 -- @return the strength value of the hand
 -- @local
 function M:evaluate_seven_card_hand(hand)
@@ -139,7 +139,7 @@ function M:evaluate(hand, impossible_hand_value)
 end
 
 --- Fast hand strength evaluation
--- @param hand a vector of several cards
+-- @param hands several hands of cards
 -- @return the strength value of the hand
 function M:evaluate_fast(hands)
   local ret = self._texas_lookup:index(1, torch.add(hands[{{}, 1}], 54))

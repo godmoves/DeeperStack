@@ -362,6 +362,8 @@ end
 -- @param action_id the index of the action that led to this node
 -- @param parent_id the index of the current node's parent
 -- @param gp_id the index of the current node's grandparent
+-- @param cur_action_id the index of current action
+-- @param parent_action_id the index of parent action
 -- @local
 function LookaheadBuilder:set_datastructures_from_tree_dfs(node, layer, action_id, parent_id, gp_id, cur_action_id, parent_action_id)
 

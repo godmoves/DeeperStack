@@ -200,6 +200,7 @@ end
 -- During continual re-solving, there is one pot size for each initial state
 -- of the second betting round (before board cards are dealt).
 -- @param pot_sizes a vector of pot sizes
+-- @param batch_size batch size
 -- betting round ends
 function NextRoundValuePre:start_computation(pot_sizes, batch_size)
   self.iter = 0

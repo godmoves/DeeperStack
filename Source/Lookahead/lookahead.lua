@@ -290,7 +290,7 @@ end
 -- Used during continual re-solving to track opponent cfvs. The lookahead must
 -- first be re-solved with @{resolve} or @{resolve_first_node}.
 --
--- @param action_index the action taken by the re-solving player at the start
+-- @param action the action taken by the re-solving player at the start
 -- of the lookahead
 -- @param board a tensor of board cards, updated by the chance event
 -- @return a vector of cfvs

@@ -25,7 +25,7 @@ function M:hand_is_possible(hand)
 end
 
 --- Gives the possible hands mask
--- @param hand a vector of cards
+-- @param hands several hands of cards
 -- @return possible hands mask
 function M:get_possible_hands_mask(hands)
   local used_cards = arguments.Tensor(hands:size(1), game_settings.card_count):fill(0)
@@ -327,7 +327,7 @@ function M:get_hole_index(hand)
 end
 
 --- Gives a numerical index for a set of hole cards.
--- @param hand a non-empty vector of hole cards, sorted
+-- @param hand_string string that represents a hand
 -- @return the numerical index for the hand
 function M:string_to_hole_index(hand_string)
   local hole = card_to_string_conversion:string_to_board(hand_string)
