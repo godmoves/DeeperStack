@@ -8,7 +8,8 @@ file = { '../Source/',
 		 exclude = { '../Source/Tree/Tests', 
 					 '../Source/Lookahead/Tests',
 					 '../Source/Nn/next_round_value_test.lua',
-					 '../Source/ACPC/Tests'}
+					 '../Source/ACPC/Tests',
+                     '../Source/Nn/Bucketing'}
 		}
 readme = { 'manual/tutorial.md',
 		   'manual/internals.md' }
