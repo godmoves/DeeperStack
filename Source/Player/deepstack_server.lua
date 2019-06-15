@@ -19,7 +19,7 @@ local last_node = nil
 -- create a TCP socket and bind it to the local host, at any port
 local server = assert(socket.bind("*", 0))
 local ip, port = server:getsockname()
-print(ip .. ": " .. port)
+print("listening to " .. ip .. ":" .. port)
 
 local client = server:accept()
 print("accepted client")
