@@ -8,10 +8,10 @@ local arguments = require 'Settings.arguments'
 local BetSizing = torch.class('BetSizing')
 
 --- Constructor
--- @param pot_fractions a list of fractions of the pot which are allowed 
+-- @param pot_fractions a list of fractions of the pot which are allowed
 -- as bets, sorted in ascending order
 function BetSizing:__init(pot_fractions)
-  pot_fractions = pot_fractions or torch.Tensor{1}
+  pot_fractions = pot_fractions or {1}
   self.pot_fractions = pot_fractions
 end
 
@@ -26,12 +26,12 @@ end
 function BetSizing:get_possible_bets(node)
   local current_player = node.current_player
   assert(current_player == 1 or current_player == 2, 'Wrong player for bet size computation')
-  local opponent = 3 - node.current_player 
+  local opponent = 3 - node.current_player
   local opponent_bet = node.bets[opponent]
 
   assert(node.bets[current_player] <= opponent_bet)
-  
-  --compute min possible raise size 
+
+  --compute min possible raise size
   local max_raise_size = arguments.stack - opponent_bet
   local min_raise_size = opponent_bet - node.bets[current_player]
   min_raise_size = math.max(min_raise_size, arguments.ante)
@@ -44,29 +44,41 @@ function BetSizing:get_possible_bets(node)
     out[1][current_player] = opponent_bet + min_raise_size
     return out
   else
-     --iterate through all bets and check if they are possible
-     local max_possible_bets_count = self.pot_fractions:size(1) + 1 --we can always go allin 
-     local out = arguments.Tensor(max_possible_bets_count,2):fill(opponent_bet)
-     
-     --take pot size after opponent bet is called
-     local pot = opponent_bet * 2
-     local used_bets_count = 0;
-     --try all pot fractions bet and see if we can use them 
-     for i = 1, self.pot_fractions:size(1)  do 
-       local raise_size = pot * self.pot_fractions[i]
-       if raise_size >= min_raise_size and raise_size < max_raise_size then
-         used_bets_count = used_bets_count + 1
-         out[{used_bets_count, current_player}] = opponent_bet + raise_size
-       end
-     end
-     --adding allin
-     used_bets_count  = used_bets_count + 1
-     assert(used_bets_count <= max_possible_bets_count)
-     out[{used_bets_count, current_player}] = opponent_bet + max_raise_size
-     return out[{{1, used_bets_count}, {}}]
-  end  
+    --iterate through all bets and check if they are possible
+    local fractions = {}
+
+    --assert(node.num_bets, 'num_bets in node is not specified')
+
+    if node.num_bets == 0 then
+      fractions = self.pot_fractions[1]
+    elseif node.num_bets == 1 then
+      fractions = self.pot_fractions[2]
+    else
+      fractions = self.pot_fractions[3]
+    end
+
+    --assert(fractions, 'No pot fractions defined for num_bets == ' .. node.num_bets)
+    
+    --we can always go allin
+    local max_possible_bets_count = #fractions + 1
+    local out = arguments.Tensor(max_possible_bets_count, 2):fill(opponent_bet)
+
+    --take pot size after opponent bet is called
+    local pot = opponent_bet * 2
+    local used_bets_count = 0
+    
+    --try all pot fractions bet and see if we can use them
+    for i = 1, #fractions do
+      local raise_size = pot * fractions[i]
+      if raise_size >= min_raise_size and raise_size < max_raise_size then
+        used_bets_count = used_bets_count + 1
+        out[{used_bets_count, current_player}] = opponent_bet + raise_size
+      end
+    end
+    --adding allin
+    used_bets_count = used_bets_count + 1
+    assert(used_bets_count <= max_possible_bets_count)
+    out[{used_bets_count, current_player}] = opponent_bet + max_raise_size
+    return out[{{1, used_bets_count}, {}}]
+  end
 end
-
-
-
-
