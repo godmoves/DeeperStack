@@ -2,12 +2,22 @@
 -- @script deepstack
 
 local arguments = require 'Settings.arguments'
-require "ACPC.acpc_game"
-require "Player.continual_resolving"
+require 'ACPC.acpc_game'
+require 'Player.continual_resolving'
+
+local port = 0
+if #arg > 0 then
+  port = tonumber(arg[1])
+else
+  print("need port")
+  return
+end
+
+torch.manualSeed(0)
 
 --1.0 create the ACPC game and connect to the server
 local acpc_game = ACPCGame()
-acpc_game:connect(arguments.acpc_server, arguments.acpc_server_port)
+acpc_game:connect(arguments.acpc_server, port)
 
 local continual_resolving = ContinualResolving()
 
@@ -21,7 +31,7 @@ while true do
 
   --2.1 blocks until it's our situation/turn
   state, node = acpc_game:get_next_situation()
-  
+
   --did a new hand start?
   if not last_state or last_state.hand_number ~= state.hand_number or node.street < last_node.street then
     continual_resolving:start_new_hand(state)
