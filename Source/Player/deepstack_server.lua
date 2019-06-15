@@ -1,4 +1,4 @@
---- Performs the main loop for DeepStack.
+--- Performs the main loop for DeepStack server.
 -- @script deepstack_sever
 
 local arguments = require 'Settings.arguments'

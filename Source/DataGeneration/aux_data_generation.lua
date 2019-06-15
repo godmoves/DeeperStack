@@ -1,4 +1,4 @@
---- Generates neural net training data by solving random poker situations.
+--- Generates neural net training data for preflop aux network.
 -- @module aux_data_generation
 local arguments = require 'Settings.arguments'
 local game_settings = require 'Settings.game_settings'

@@ -1,4 +1,4 @@
---- Script that convert raw training data to bucket.
+--- Script that converts raw training data to bucketed data.
 -- @script raw_converter
 
 if #arg == 0 then
