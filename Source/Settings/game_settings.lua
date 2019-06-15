@@ -18,10 +18,13 @@ M.hand_card_count = 2
 --- all possible private hand count
 M.hand_count = tools:choose(M.card_count, M.hand_card_count)
 --- list of the number of public cards dealt in the game (revealed after the
---first betting round)
+-- first betting round)
+-- @field M.board_card_count
 M.board_card_count = {0, 3, 4, 5}
 --- list of max bet number in each street
+-- @field M.limit_bet_sizes
 M.limit_bet_sizes = {2, 2, 4, 4}
+--- max bet number
 M.limit_bet_cap = 4
 --- if we are playing no limit game
 M.nl = true
