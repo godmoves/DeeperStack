@@ -7,25 +7,27 @@ torch.setdefaulttensortype('torch.FloatTensor')
 
 local params = {}
 
+--- cache board buckets for faster loading
+params.cache_boards = true
 --- whether to run on GPU
 params.gpu = false
---- list of pot-scaled bet sizes to use in tree
+--- list of pot-scaled bet sizes to use in tree, for flop/turn/river.
 -- @field params.bet_sizing
-params.bet_sizing = {1}
+params.bet_sizing = {{1},{1},{1}}
 --- server running the ACPC dealer
 params.acpc_server = "localhost"
 --- server port running the ACPC dealer
-params.acpc_server_port = 20000
---- the number of betting rounds in the game
-params.streets_count = 2
+params.acpc_server_port = 16177
 --- the tensor datatype used for storing DeepStack's internal data
 params.Tensor = torch.FloatTensor
 --- the directory for data files
 params.data_directory = '../Data/'
---- the size of the game's ante, in chips
+--- the size of the game's ante/small blind/big blind, in chips
 params.ante = 100
+params.sb = 50
+params.bb = 100
 --- the size of each player's stack, in chips
-params.stack = 1200
+params.stack = 20000
 --- the number of iterations that DeepStack runs CFR for
 params.cfr_iters = 1000
 --- the number of preliminary CFR iterations which DeepStack doesn't factor into the average strategy (included in cfr_iters)
@@ -35,24 +37,23 @@ params.gen_batch_size = 10
 --- how many poker situations are used in each neural net training batch
 params.train_batch_size = 100
 --- path to the solved poker situation data used to train the neural net
-params.data_path = '../Data/TrainSamples/PotBet/'
+params.data_path = '../Data/TrainSamples/'
 --- path to the neural net model
-params.model_path = '../Data/Models/PotBet/'
+params.model_path = '../Data/Models/'
 --- the name of the neural net file
 params.value_net_name = 'final'
---- the neural net architecture
-params.net = '{nn.Linear(input_size, 50), nn.PReLU(), nn.Linear(50, output_size)}'
+--- the neural net architecture, use 3 layers by default.
+params.net = '{nn.Linear(input_size, 500), nn.BatchNormalization(500), nn.PReLU(), nn.Linear(500, 500), nn.BatchNormalization(500), nn.PReLU(), nn.Linear(500, 500), nn.BatchNormalization(500), nn.PReLU(), nn.Linear(500, output_size)}'
 --- how often to save the model during training
-params.save_epoch = 2
+params.save_epoch = 1
 --- how many epochs to train for
-params.epoch_count = 10
+params.epoch_count = 300
 --- how many solved poker situations are generated for use as training examples
-params.train_data_count = 100
---- how many solved poker situations are generated for use as validation examples
-params.valid_data_count = 100
+params.train_data_count = 1500000
 --- learning rate for neural net training
 params.learning_rate = 0.001
-
+--- how epochs are needed to decrease learning_rate to learning_rate / 10
+params.decrease_learning_at_epoch = 200
 
 assert(params.cfr_iters > params.cfr_skip_iters)
 if params.gpu then

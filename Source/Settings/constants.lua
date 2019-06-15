@@ -6,7 +6,7 @@ local constants = {}
 --- the number of players in the game
 constants.players_count = 2
 --- the number of betting rounds in the game
-constants.streets_count = 2
+constants.streets_count = 4
 
 --- IDs for each player and chance
 -- @field chance `0`
@@ -22,7 +22,7 @@ constants.players.P2 = 2
 -- @field terminal_call (terminal node following call) `-1`
 -- @field chance_node (node for the chance player) `0`
 -- @field check (node following check) `-1`
--- @field inner_node (any other node) `2`
+-- @field inner_node (any other node) `1`
 constants.node_types = {}
 constants.node_types.terminal_fold = -2
 constants.node_types.terminal_call = -1
@@ -36,6 +36,7 @@ constants.node_types.inner_node = 1
 constants.actions = {}
 constants.actions.fold = -2
 constants.actions.ccall = -1
+constants.actions.raise = -3
 
 --- String representations for actions in the ACPC protocol
 -- @field fold "`fold`"
