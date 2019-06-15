@@ -210,12 +210,6 @@ There is a script in Python that you can use to play versus Slum Bot.
 4. `cd Source && python Player/slumbot_player.py localhost 16177`
 5. Wait for enough data to be generated.
 
-## Testing deeper-stacker source code
-
-There are a few tests defined:
-1. Install `luarocks install busted`
-2. `cd Source && busted --no-auto-insulate`
-
 ## Differences from the original paper
 
 - A river model was used instead of solving directly from the turn.
