@@ -56,7 +56,7 @@ function M:generate_data_file(data_count, file_name, street)
   
   local train_folder = tools:get_trianing_path(street, game_settings.nl)
 
-  -- Calculate min, max and range pot
+  --calculate min, max and range pot
   local min_pot, max_pot = tool:get_pot_size(street, game_settings.nl)
 
   local pot_range = {}
@@ -76,13 +76,13 @@ function M:generate_data_file(data_count, file_name, street)
     te:set_board(board)
     range_generator:set_board(te, board)
 
-    -- Generating ranges
+    --generating ranges
     local ranges = arguments.Tensor(constants.players_count, batch_size, game_settings.hand_count)
     for player = 1, constants.players_count do
       range_generator:generate_range(ranges[player])
     end
 
-    -- Generating pot sizes between ante and stack - 0.1
+    --generating pot sizes between ante and stack - 0.1
     local random_pot_cat = torch.rand(1):mul(#min_pot):add(1):floor()[1]
     local random_pot_size = torch.rand(1)[1]
 
@@ -90,10 +90,10 @@ function M:generate_data_file(data_count, file_name, street)
     random_pot_size = random_pot_size + min_pot[random_pot_cat]
     random_pot_size = math.floor(random_pot_size)
 
-    -- Pot features are pot sizes normalized between (ante/stack,1)
+    --pot features are pot sizes normalized between (ante/stack,1)
     local pot_size_feature = game_settings.nl and (random_pot_size / arguments.stack) or (random_pot_size / max_pot[3])
 
-    -- Translating ranges to features
+    --translating ranges to features
     local pot_feature_index = -1
     inputs[{{}, pot_feature_index}]:fill(pot_size_feature)
 
@@ -103,7 +103,7 @@ function M:generate_data_file(data_count, file_name, street)
       inputs[{{}, player_index}]:copy(ranges[player])
     end
 
-    -- Computation of values using re-solving
+    --computation of values using re-solving
     local values = arguments.Tensor(batch_size, constants.players_count, game_settings.hand_count)
 
     local pot_size = random_pot_size
@@ -117,7 +117,7 @@ function M:generate_data_file(data_count, file_name, street)
     current_node.num_bets = 0
     current_node.current_player = street == 1 and constants.players.P1 or constants.players.P2
 
-    --TODO support preflop bets
+    --TODO merge preflop bets support
     current_node.bets = arguments.Tensor{pot_size, pot_size}
     local p1_range = ranges[1]
     local p2_range = ranges[2]

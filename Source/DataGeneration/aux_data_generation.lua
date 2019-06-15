@@ -82,13 +82,13 @@ function M:generate_data_file(data_count, file_name, street)
     local timer = torch.Timer()
     timer:reset()
 
-    -- Generating ranges
+    --generating ranges
     local ranges = arguments.Tensor(constants.players_count, batch_size, game_settings.hand_count)
     for player = 1, constants.players_count do
       range_generator:generate_range(ranges[player])
     end
 
-    -- Generating pot sizes between ante and stack - 0.1
+    --generating pot sizes between ante and stack - 0.1
     local min_pot, max_pot = tool:get_pot_size(street, game_settings.nl)
 
     local pot_range = {}
@@ -103,11 +103,11 @@ function M:generate_data_file(data_count, file_name, street)
       random_pot_sizes[i][1] = random_pot_sizes[i][1] + min_pot[random_pot_cats[i]]
     end
 
-    -- Pot features are pot sizes normalized between (ante/stack,1)
+    --pot features are pot sizes normalized between (ante/stack,1)
     local pot_size_features = game_settings.nl and random_pot_sizes:clone():mul(1/arguments.stack) or
         random_pot_sizes:clone():mul(1/max_pot[3])
 
-    -- Translating ranges to features
+    --translating ranges to features
     local pot_feature_index =  -1
     inputs[{{}, pot_feature_index}]:copy(pot_size_features)
     input_batch[{{}, pot_feature_index}]:copy(pot_size_features)
