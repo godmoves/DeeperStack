@@ -1,26 +1,29 @@
-# DeepHoldem
+# DeeperStack
 
 This is an implementation of [DeepStack](https://www.deepstack.ai/s/DeepStack.pdf)
 for No Limit Texas Hold'em, extended from [DeepStack-Leduc](https://github.com/lifrordi/DeepStack-Leduc).
 
 ## Setup
 
-Running any of the DeepHoldem code requires [Lua](https://www.lua.org/) and [torch](http://torch.ch/). Please install torch with lua version 5.2 instead of LuaJIT. Torch is only officially supported for \*NIX based systems (i.e. Linux and Mac
-OS X).
+Running any of the DeeperStack code requires [Lua](https://www.lua.org/) and [torch](http://torch.ch/). Please install torch with lua version 5.2 instead of LuaJIT. Torch is only officially supported for \*NIX based systems (i.e. Linux and Mac OS X). Read `torch/prepare.sh` for more information about how to setup the torch environment.
 
-Connecting DeepHoldem to a server or running DeepHoldem on a server will require the [luasocket](http://w3.impa.br/~diego/software/luasocket/)
+Connecting DeeperStack to a server or running DeeperStack on a server will require the [luasocket](http://w3.impa.br/~diego/software/luasocket/)
 package. This can be installed with [luarocks](https://luarocks.org/) (which is
 installed as part of the standard torch distribution) using the command
-`luarocks install luasocket`. Visualising the trees produced by DeepHoldem
+`luarocks install luasocket`. Visualising the trees produced by DeeperStack
 requires the [graphviz](http://graphviz.org/) package, which can be installed
 with `luarocks install graphviz`. Running the code on the GPU requires
 [cutorch](https://github.com/torch/cutorch) which can be installed with
 `luarocks install cutorch`.
 
-The HandRanks file was too big for github, so you will need to unzip it: `cd Source/Game/Evaluation && unzip HandRanks.zip`
+### Hand ranks
+The HandRanks file was too big for github, so you will need to unzip it:
+```
+cd Source/Game/Evaluation && unzip HandRanks.zip
+```
 
-#### scatterAdd
-When you try to run DeepHoldem, you will eventually run into a problem where `scatterAdd` is not defined.
+### scatterAdd
+When you try to run DeeperStack, you will eventually run into a problem where `scatterAdd` is not defined.
 Torch7 actually includes a C++ implementation of scatterAdd but for whatever reason, doesn't include a lua
 wrapper for it.
 
@@ -43,22 +46,22 @@ This implementation was tested against Slumbot 2017, the only publicly playable 
 
 A comparison of preflop ranges was also done against [DeepStack's hand history](https://www.deepstack.ai/s/DeepStack_vs_IFP_pros.zip), showing similar results.
 
-| Action                  | DeepStack                           | DeepHoldem                    |
-| ---                     | ---                                 | ---                           |
-| Open fold               |![](Data/Images/deepstack_folds.png) | ![](Data/Images/my_folds.png) |
-| Open pot                |![](Data/Images/deepstack_pots.png)  | ![](Data/Images/my_pots.png)  |
-| 3bet pot after pot open |![](Data/Images/deepstack_3bets.png) | ![](Data/Images/my_3bets.png) |
+| Action                  | DeepStack                           | DeeperStack                    |
+| ---                     | ---                                 | ---                            |
+| Open fold               |![](Data/Images/deepstack_folds.png) | ![](Data/Images/my_folds.png)  |
+| Open pot                |![](Data/Images/deepstack_pots.png)  | ![](Data/Images/my_pots.png)   |
+| 3bet pot after pot open |![](Data/Images/deepstack_3bets.png) | ![](Data/Images/my_3bets.png)  |
 
 Average thinking speed comparison:
 
-| Street  | DeepStack Thinking Speed (s) | DeepHoldem Thinking Speed (s) |
-| ---     | ---                          | ---                           |
-| Preflop | 0.2                          | 2.69                          |
-| Flop    | 5.9                          | 12.42                         |
-| Turn    | 5.5                          | 7.57                          |
-| River   | 2.1                          | 3.33                          |
+| Street  | DeepStack Thinking Speed (s) | DeeperStack Thinking Speed (s) |
+| ---     | ---                          | ---                            |
+| Preflop | 0.2                          | 2.69                           |
+| Flop    | 5.9                          | 12.42                          |
+| Turn    | 5.5                          | 7.57                           |
+| River   | 2.1                          | 3.33                           |
 
-DeepHoldem using a NVIDIA Tesla P100.
+DeeperStack using a NVIDIA Tesla P100.
 DeepStack using a NVIDIA GeForce GTX 1080.
 
 Training details:
@@ -72,18 +75,18 @@ Training details:
 
 Training data and Validation Huber Loss comparison:
 
-| Network             | DeepStack # ps | DeepStack vhb | DeepHoldem # ps | DeepHoldem vhb |
-| ---                 | ---            | ---           | ---             | ---            |
-| River network       | (no used)      | (no used)     | 1,000,000       | 0.0415         |
-| Turn network        | 10,000,000     | 0.026         | 1,000,000       | 0.045          |
-| Flop network        |  1,000,000     | 0.034         | 1,000,000       | 0.013          |
-| Preflop aux network | 10,000,000     | 0.000055      | 1,000,000       | 0.0017         |
+| Network             | DeepStack # ps | DeepStack vhb | DeeperStack # ps | DeeperStack vhb |
+| ---                 | ---            | ---           | ---              | ---             |
+| River network       | (no used)      | (no used)     | 1,000,000        | 0.0415          |
+| Turn network        | 10,000,000     | 0.026         | 1,000,000        | 0.045           |
+| Flop network        |  1,000,000     | 0.034         | 1,000,000        | 0.013           |
+| Preflop aux network | 10,000,000     | 0.000055      | 1,000,000        | 0.0017          |
 
 Note that:
 * ps: poker situation
 * vhb: validation huber loss
 
-If you need to extract Neuronal network information, just type `th` and:
+If you need to extract Neural network information, just type `th` and:
 ```
 $ torch.load('final_cpu.info')
 {
@@ -118,7 +121,7 @@ Just to make sure that you understand it:
 
 ## Training your models
 
-DeepHoldem is not a single neuronal network. DeepHoldem is composed of four networks:
+DeeperStack is not a single neural network. DeeperStack is composed of four networks:
  * River network
  * Turn network
  * Flop network
@@ -129,12 +132,12 @@ Remember that to generate training data for a network, you will need to have the
 The workflow should be:
 
 ```
-River > Turn > Flop > Preflop aux
+River -> Turn -> Flop -> Preflop aux
 ```
 
 Preflop aux is already included, so you won't need to train it if you want.
 
-In the future, if you want to train your neuronal network with more poker situations, you will have to generate again preflop, flop and turn samples. This is because turn poker situations depends on river model (and the same for flop because depends on turn model...).
+In the future, if you want to train your neural network with more poker situations, you will have to generate again preflop, flop and turn samples. This is because turn poker situations depends on river model (and the same for flop because depends on turn model...).
 
 ## Abstraction actions
 
@@ -145,7 +148,7 @@ DeepStack uses following actions to generate poker situations:
  * Bet Pot (1p).
  * All-in.
 
-DeepHoldem uses following actions:
+DeeperStack uses following actions:
  * Fold.
  * Call/Check.
  * Bet Pot (1p).
@@ -179,10 +182,10 @@ Here's a step by step guide to creating models:
 
 By default, data generation and model training uses GPU, if you want to disable it, just modify `Settings/arguments.lua` to `params.gpu = false`.
 
-## Playing against DeepHoldem
+## Playing against DeeperStack
 
-`Player/manual_player.lua` is supplied so you can play against DeepHoldem for preflop situations. If you want
-DeepHoldem to work for flop, turn and river, you will need to create your own models.
+`Player/manual_player.lua` is supplied so you can play against DeeperStack for preflop situations. If you want
+DeeperStack to work for flop, turn and river, you will need to create your own models.
 
 1. `cd ACPCServer && make`
 2. `./dealer testMatch holdem.nolimit.2p.reverse_blinds.game 1000 0 Alice Bob`
@@ -226,7 +229,6 @@ There are a few tests defined:
 ## Future work
 
 - Warm start opponent ranges for re-solving
-- Cache flop buckets so initializing next_round_value_pre doesn't take 20 minutes
 - Speed up flop solving (use flop network during preflop solving?)
 - Support LuaJIT
 - C++ implementation?
@@ -234,3 +236,7 @@ There are a few tests defined:
 ## References
 
 DeepStack Paper & Supplements: https://www.deepstack.ai/downloads
+
+## Documentation
+
+The documentation for code files was automatically generated with [LDoc](https://github.com/stevedonovan/LDoc), which can be installed with `luarocks install ldoc`. To re-generate the docs, run `ldoc .` in the `doc/` directory. If you wish to also generate documentation for local functions, run `ldoc . -all` instead.
