@@ -109,4 +109,36 @@ function M:get_trianing_path(street, nolimit)
   return train_folder
 end
 
+--- Get path to model file
+-- @param street current street
+-- @param aux if we are using preflow net
+-- @param nolimit if we are playing no limit game
+-- @return path to model file
+function M:get_model_path(street, aux, nolimit)
+  local net_file = ""
+
+  if nolimit then
+    net_file = net_file .. "NoLimit/"
+  else
+    net_file = net_file .. "Limit/"
+  end
+
+  assert(street <= 3)
+
+  if aux then
+    assert(street == 1)
+    net_file = net_file .. "preflop-aux/"
+  else
+    if street == 3 then
+      net_file = net_file .. "river/"
+    elseif street == 2 then
+      net_file = net_file .. "turn/"
+    elseif street == 1 then
+      net_file = net_file .. "flop/"
+    end
+  end
+
+  return net_file
+end
+
 return M

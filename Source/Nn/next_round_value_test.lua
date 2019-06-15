@@ -46,7 +46,7 @@ next_round_value:get_value(ranges, values)
 
 print(values)
 
-----[[
+--[[
 local ranges_2 = ranges:view(2, game_settings.card_count):clone()
 local values_2 = ranges_2:clone():fill(-1)
 
@@ -55,7 +55,7 @@ terminal_equity:set_board(torch.Tensor{})
 terminal_equity:call_value(ranges_2, values_2)
 print('terminal_equity')
 print(values_2)
----]]
+]]
 
 --[[
 local board = card_to_string:string_to_board('Ks')
@@ -65,6 +65,3 @@ next_round_value:get_value_on_board(board, values_3)
 
 print(values_3)
 ]]
-
-
-

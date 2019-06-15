@@ -3,10 +3,11 @@
 
 require 'torch'
 require 'math'
-require 'Nn.bucketer'
 local card_tools = require 'Game.card_tools'
 local arguments = require 'Settings.arguments'
 local game_settings = require 'Settings.game_settings'
+local bucketer = require 'Nn.bucketer'
+local tools = require 'tools'
 
 local BucketConversion = torch.class('BucketConversion')
 
@@ -16,26 +17,34 @@ end
 
 --- Sets the board cards for the bucketer.
 -- @param board a non-empty vector of board cards
-function BucketConversion:set_board(board)
-  self.bucketer = Bucketer()
-  self.bucket_count = self.bucketer:get_bucket_count()
-  self._range_matrix = arguments.Tensor(game_settings.card_count, self.bucket_count ):zero()
+function BucketConversion:set_board(board, raw)
+  if raw ~= nil then
+    self.bucket_count = tools:choose(14, 2) + tools:choose(10, 2)
+  else
+    self.bucket_count = bucketer:get_bucket_count(card_tools:board_to_street(board))
+  end
+  self._range_matrix = arguments.Tensor(game_settings.hand_count, self.bucket_count ):zero()
 
-  local buckets = self.bucketer:compute_buckets(board)
+  local buckets = nil
+  if raw ~= nil then
+    buckets = bucketer:compute_rank_buckets(board)
+  else
+    buckets = bucketer:compute_buckets(board)
+  end
   local class_ids = torch.range(1, self.bucket_count)
 
-  if arguments.gpu then 
-    buckets = buckets:cuda() 
+  if arguments.gpu then
+    buckets = buckets:cuda()
     class_ids = class_ids:cuda()
   else
-    class_ids = class_ids:float() 
+    class_ids = class_ids:float()
   end
 
-  class_ids = class_ids:view(1, self.bucket_count):expand(game_settings.card_count, self.bucket_count)
-  local card_buckets = buckets:view(game_settings.card_count, 1):expand(game_settings.card_count, self.bucket_count)
+  class_ids = class_ids:view(1, self.bucket_count):expand(game_settings.hand_count, self.bucket_count)
+  local card_buckets = buckets:view(game_settings.hand_count, 1):expand(game_settings.hand_count, self.bucket_count)
 
-  --finding all strength classes      
-  --matrix for transformation from card ranges to strength class ranges 
+  --finding all strength classes
+  --matrix for transformation from card ranges to strength class ranges
   self._range_matrix[torch.eq(class_ids, card_buckets)] = 1
 
   --matrix for transformation form class values to card values
@@ -43,17 +52,44 @@ function BucketConversion:set_board(board)
 end
 
 --- Converts a range vector over private hands to a range vector over buckets.
--- 
+--
 -- @{set_board} must be called first. Used to create inputs to the neural net.
 -- @param card_range a probability vector over private hands
--- @param bucket_range a vector in which to save the resulting probability 
+-- @param bucket_range a vector in which to save the resulting probability
 -- vector over buckets
 function BucketConversion:card_range_to_bucket_range(card_range, bucket_range)
+  if arguments.gpu then
+    card_range = card_range:cuda()
+  else
+    card_range = card_range:float()
+  end
+  
   bucket_range:mm(card_range, self._range_matrix)
 end
 
+--- Converts hand cfvs to bucket cfvs.
+--
+-- @param card_range a probability vector over private hands
+-- @param card_cfvs a vector of cfvs achieved by the cards
+-- @param bucket_range a probability vector over bucket
+-- @param bucket_cfvs a vector in which to save the resulting cfvs 
+function BucketConversion:hand_cfvs_to_bucket_cfvs(card_range, card_cfvs, bucket_range, bucketed_cfvs)
+  if arguments.gpu then
+    card_range = card_range:cuda()
+    card_cfvs = card_cfvs:cuda()
+  else
+    card_range = card_range:float()
+    card_cfvs = card_cfvs:float()
+  end
+  
+  bucketed_cfvs:mm(torch.cmul(card_range, card_cfvs), self._range_matrix)
+
+  -- avoid divide by 0
+  bucketed_cfvs:cdiv(torch.cmax(bucket_range, 0.00001))
+end
+
 --- Converts a value vector over buckets to a value vector over private hands.
--- 
+--
 -- @{set_board} must be called first. Used to process neural net outputs.
 -- @param bucket_value a vector of values over buckets
 -- @param card_value a vector in which to save the resulting vector of values
@@ -63,13 +99,16 @@ function BucketConversion:bucket_value_to_card_value(bucket_value, card_value)
 end
 
 --- Gives a vector of possible buckets on the the board.
--- 
+--
 -- @{set_board} must be called first.
 -- @return a mask vector over buckets where each entry is 1 if the bucket is
 -- valid, 0 if not
 function BucketConversion:get_possible_bucket_mask()
   local mask = arguments.Tensor(1, self.bucket_count)
-  local card_indicator = arguments.Tensor(1, game_settings.card_count):fill(1)
+  local card_indicator = arguments.Tensor(1, game_settings.hand_count):fill(1)
+
   mask:mm(card_indicator, self._range_matrix)
+  mask[torch.gt(mask, 0)] = 1
+
   return mask
 end

@@ -1,27 +1,324 @@
 --- Assigns hands to buckets on the given board.
--- 
+--
 -- For the Leduc implementation, we simply assign every possible set of
 -- private and board cards to a unique bucket.
 -- @classmod bucketer
 local game_settings = require 'Settings.game_settings'
 local card_tools = require 'Game.card_tools'
-local bucketer = torch.class('Bucketer')
+local card_to_string = require 'Game.card_to_string_conversion'
+local arguments = require 'Settings.arguments'
+local constants = require 'Settings.constants'
+local river_tools = require 'Nn.Bucketing.river_tools'
+local turn_tools = require 'Nn.Bucketing.turn_tools'
+local flop_tools = require 'Nn.Bucketing.flop_tools'
+local card_to_string_conversion = require 'Game.card_to_string_conversion'
+local evaluator = require 'Game.Evaluation.evaluator'
+local tools = require 'tools'
+
+local M = {}
+
+function M:_init()
+  if self._ihr_pair_to_bucket == nil then
+    local file_found = io.open("./Nn/Bucketing/riverihrarray.dat", "r")
+    if file_found ~= nill then
+      io.close(file_found)
+      self._river_ihr = torch.load("./Nn/Bucketing/riverihrarray.dat")
+      print("1 loaded riverihrarray")
+    else
+      local f = assert(io.open("./Nn/Bucketing/riverihr.dat", "rb"))
+      local data = f:read("*all")
+
+      self._river_ihr = {}
+      for i = 1, string.len(data), 7 do
+        local key = 0
+        for j = i,i+4 do
+          key = key + data:byte(j) * (2 ^ ((4 - j + i) * 8))
+        end
+        local win = data:byte(i+5)
+        local tie = data:byte(i+6)
+        self._river_ihr[key] = win*200 + tie
+      end
+      f:close()
+      --torch.save('riverihrarray.dat', self._river_ihr)
+    end
+    
+    file_found = io.open("./Nn/Bucketing/ihrpairtobucketrarray.dat", "r")
+    if file_found ~= nill then
+      io.close(file_found)
+      self._ihr_pair_to_bucket = torch.load("./Nn/Bucketing/ihrpairtobucketrarray.dat")
+      self.river_buckets = torch.load("./Nn/Bucketing/river_bucketsarray.dat")
+      print("2 loaded ihrpairtobucketrarray")
+    else
+      local f = assert(io.open("./Nn/Bucketing/rcats.dat", "r"))
+      self.river_buckets = f:read("*number")
+      self._ihr_pair_to_bucket = {}
+      for i = 1, self.river_buckets do
+        local win = f:read("*number")
+        local tie = f:read("*number")
+        self._ihr_pair_to_bucket[win * 1000 + tie] = i
+      end
+      f:close()
+      --torch.save('ihrpairtobucketrarray.dat', self._ihr_pair_to_bucket)
+    end
+  end
+
+  if self._turn_means == nil then
+    local file_found = io.open("./Nn/Bucketing/turn_meansarray.dat", "r")
+    if file_found ~= nill then
+      io.close(file_found)
+      self._turn_means = torch.load("./Nn/Bucketing/turn_meansarray.dat")
+      print("3 loaded turn_meansarray")
+    else
+      self._turn_means = {}
+      local f = assert(io.open("./Nn/Bucketing/turn_means.dat"))
+      local num_means = f:read("*number")
+      for i = 1,num_means do
+        local dist = {}
+        for j = 0,50 do
+          dist[j] = f:read("*number")
+        end
+        self._turn_means[i] = dist
+      end
+      f:close()
+      --torch.save('turn_meansarray.dat', self._turn_means)
+    end
+  end
+
+  if self._turn_cats == nil then
+    local file_found = io.open("./Nn/Bucketing/turn_dist_catsarray.dat", "r")
+    if file_found ~= nill then
+      io.close(file_found)
+      self._turn_cats = torch.load("./Nn/Bucketing/turn_dist_catsarray.dat")
+      print("4 loaded turn_dist_catsarray")
+    else
+      self._turn_cats = {}
+      local f = assert(io.open("./Nn/Bucketing/turn_dist_cats.dat", "rb"))
+      local data = f:read("*all")
+
+      for i = 1, string.len(data), 6 do
+        local key = 0
+        for j = i,i+3 do
+          key = key + data:byte(j) * (2 ^ ((j - i) * 8))
+        end
+        local cat = data:byte(i+4) + data:byte(i+5) * (2 ^ 8)
+        self._turn_cats[key] = cat
+
+        assert(cat <= 1000 and cat >= 1, "cat = " .. cat)
+      end
+      f:close()
+      --torch.save('turn_dist_catsarray.dat', self._turn_cats)
+    end
+  end
+  if self._flop_cats == nil then
+    local file_found = io.open("./Nn/Bucketing/flop_dist_catsarray.dat", "r")
+    if file_found ~= nill then
+      io.close(file_found)
+      self._flop_cats = torch.load("./Nn/Bucketing/flop_dist_catsarray.dat")
+      print("5 loaded flop_dist_catsarray")
+    else
+      self._flop_cats = {}
+      local f = assert(io.open("./Nn/Bucketing/flop_dist_cats.dat", "rb"))
+      local data = f:read("*all")
+
+      for i = 1, string.len(data), 6 do
+        local key = 0
+        for j = i,i+3 do
+          key = key + data:byte(j) * (2 ^ ((j - i) * 8))
+        end
+        local cat = data:byte(i+4) + data:byte(i+5) * (2 ^ 8)
+        self._flop_cats[key] = cat
+
+        assert(cat <= 1000 and cat >= 1, "cat = " .. cat)
+      end
+      f:close()
+      --torch.save('flop_dist_catsarray.dat', self._flop_cats)
+    end
+  end
+end
+
+M:_init()
 
 --- Gives the total number of buckets across all boards.
+-- @param street current street we are at
 -- @return the number of buckets
-function bucketer:get_bucket_count()
-  return game_settings.card_count * card_tools:get_boards_count()
+function M:get_bucket_count(street)
+  if street == 4 then
+    return self.river_buckets
+  elseif street == 3 or street == 2 then
+    return 1000
+  elseif street == 1 then
+    return 169
+  end
+  return 169
+end
+
+--- Gives the maximum number of ranks across all boards.
+-- @return the number of buckets
+function M:get_rank_count()
+  return tools:choose(14, 2) + tools:choose(10, 2)
+end
+
+--- Computes turn buckets
+-- @param board a non-empty vector of board cards
+-- @return a vector which maps each private hand to a bucket index
+-- @local
+function M:_compute_turn_buckets(board)
+  local buckets = torch.Tensor(game_settings.hand_count):fill(-1)
+  local used = torch.ByteTensor(game_settings.card_count):fill(0)
+  local hand = torch.ByteTensor(7)
+  for i = 1, board:size(1) do
+    used[board[i]] = 1
+    hand[i + 2] = board[i]
+  end
+
+  for card1 = 1, game_settings.card_count do
+    if used[card1] == 0 then
+      used[card1] = 1
+      hand[1] = card1
+      for card2 = card1+1, game_settings.card_count do
+        if used[card2] == 0 then
+          used[card2] = 1
+          hand[2] = card2
+
+          local idx = card_tools:get_hole_index({card1,card2})
+
+          --print(card_to_string_conversion:cards_to_string(hand[{{1,6}}]))
+          local turn_code = turn_tools:turnID(hand[{{1,2}}]:clone(), hand[{{3,6}}]:clone())
+
+          local closest_mean = self._turn_cats[turn_code]
+          buckets[idx] = closest_mean
+
+          used[card2] = 0
+        end
+      end
+      used[card1] = 0
+    end
+  end
+
+  return buckets
+end
+
+--- Computes flop buckets
+-- @param board a non-empty vector of board cards
+-- @return a vector which maps each private hand to a bucket index
+-- @local
+function M:_compute_flop_buckets(board)
+  local buckets = torch.Tensor(game_settings.hand_count):fill(-1)
+  local used = torch.ByteTensor(game_settings.card_count):fill(0)
+  local hand = torch.ByteTensor(5)
+  for i = 1, board:size(1) do
+    used[board[i]] = 1
+    hand[i + 2] = board[i]
+  end
+
+  for card1 = 1, game_settings.card_count do
+    if used[card1] == 0 then
+      used[card1] = 1
+      hand[1] = card1
+      for card2 = card1+1, game_settings.card_count do
+        if used[card2] == 0 then
+          used[card2] = 1
+          hand[2] = card2
+
+          local idx = card_tools:get_hole_index({card1,card2})
+
+          local flop_code = flop_tools:flopID(hand[{{1,2}}]:clone(), hand[{{3,5}}]:clone())
+
+          local closest_mean = self._flop_cats[flop_code]
+          buckets[idx] = closest_mean
+
+          used[card2] = 0
+        end
+      end
+      used[card1] = 0
+    end
+  end
+  return buckets
+end
+
+--- Computes preflop buckets
+-- @param board a non-empty vector of board cards
+-- @return a vector which maps each private hand to a bucket index
+-- @local
+function M:_compute_preflop_buckets()
+  if self._preflop_buckets == nil then
+    self._preflop_buckets = arguments.Tensor(game_settings.hand_count):fill(-1)
+
+    for card1 = 1,game_settings.card_count do
+      for card2 = card1+1, game_settings.card_count do
+
+        local idx = card_tools:get_hole_index({card1,card2})
+
+        local rank1 = math.floor((card1 - 1) / 4)
+        local rank2 = math.floor((card2 - 1) / 4)
+        if card1 % 4 == card2 % 4 then
+          self._preflop_buckets[idx] = rank1 * 13 + rank2 + 1
+        else
+          self._preflop_buckets[idx] = rank2 * 13 + rank1 + 1
+        end
+      end
+    end
+  end
+  return self._preflop_buckets
+end
+
+--- Computes river buckets
+-- @param board a non-empty vector of board cards
+-- @return a vector which maps each private hand to a bucket index
+-- @local
+function M:_compute_river_buckets(board)
+  local buckets = torch.Tensor(game_settings.hand_count):fill(-1)
+  local used = torch.ByteTensor(game_settings.card_count):fill(0)
+  local board_size = board:size(1)
+  for i = 1, board_size do
+    used[board[i]] = 1
+  end
+  local hands = torch.ByteTensor(constants.players_count, board_size + game_settings.hand_card_count)
+  for i = 1, constants.players_count do
+    hands[{i,{1, - 1 - game_settings.hand_card_count}}]:copy(board)
+  end
+
+  for card1 = 1, game_settings.card_count do
+    if used[card1] == 0 then
+      used[card1] = 1
+      hands[1][-2] = card1
+      for card2 = card1+1, game_settings.card_count do
+        if used[card2] == 0 then
+          used[card2] = 1
+          hands[1][-1] = card2
+          local idx = card_tools:get_hole_index({card1,card2})
+
+          local code = river_tools:riverID(hands[1][{{6,7}}], hands[1][{{1,5}}])
+          local ihr = self._river_ihr[code]
+          local win_bucket = math.floor(ihr/200)
+          local tie_bucket = math.floor((ihr % 200)/2)
+
+          local r_bucket = self._ihr_pair_to_bucket[win_bucket * 1000 + tie_bucket]
+          assert(r_bucket ~= nil, 'bad win,tie ihr pair')
+          buckets[idx] = r_bucket
+          used[card2] = 0
+        end
+      end
+      used[card1] = 0
+    end
+  end
+
+  return buckets
 end
 
 --- Gives a vector which maps private hands to buckets on a given board.
 -- @param board a non-empty vector of board cards
 -- @return a vector which maps each private hand to a bucket index
-function bucketer:compute_buckets(board)
-  local shift = (card_tools:get_board_index(board) - 1) * game_settings.card_count
-  local buckets = torch.range(1, game_settings.card_count):float():add(shift)
-  --impossible hands will have bucket number -1
-  for i = 1,board:size(1) do 
-    buckets[board[i]] = -1
+function M:compute_buckets(board)
+  local street = card_tools:board_to_street(board)
+
+  if street == 4 then
+    return self:_compute_river_buckets(board)
+  elseif street == 3 then
+    return self:_compute_turn_buckets(board)
+  elseif street == 2 then
+    return self:_compute_flop_buckets(board)
+  elseif street == 1 then
+    return self:_compute_preflop_buckets()
   end
-  return buckets
 end
