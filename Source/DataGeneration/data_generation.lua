@@ -57,7 +57,7 @@ function M:generate_data_file(data_count, file_name, street)
   local train_folder = tools:get_trianing_path(street, game_settings.nl)
 
   --calculate min, max and range pot
-  local min_pot, max_pot = tool:get_pot_size(street, game_settings.nl)
+  local min_pot, max_pot = tools:get_pot_size(street, game_settings.nl)
 
   local pot_range = {}
 

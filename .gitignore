@@ -4,3 +4,4 @@
 *.inputs
 *.pyc
 HandRanks.dat
+board_buckets.dat

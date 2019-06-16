@@ -65,7 +65,7 @@ function M:get_pot_size(street, nolimit)
   local min_pot = {}
   local max_pot = {}
 
-  if game_settings.nl then
+  if nolimit then
     min_pot = {100, 200, 400, 2000, 6000}
     max_pot = {100, 400, 2000, 6000, 18000}
   else

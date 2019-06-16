@@ -7,6 +7,11 @@ local constants = require 'Settings.constants'
 require 'ACPC.acpc_game'
 require 'Player.continual_resolving'
 
+local input_port = 0
+if #arg > 0 then
+  input_port = tonumber(arg[1])
+end
+
 --1.0 create the ACPC game and connect to the server
 local acpc_game = ACPCGame()
 
@@ -17,7 +22,7 @@ local last_node = nil
 
 -- load namespace
 -- create a TCP socket and bind it to the local host, at any port
-local server = assert(socket.bind("*", 0))
+local server = assert(socket.bind("*", input_port))
 local ip, port = server:getsockname()
 print("listening to " .. ip .. ":" .. port)
 
