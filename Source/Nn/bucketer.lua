@@ -323,3 +323,34 @@ function M:compute_buckets(board)
     return self:_compute_preflop_buckets()
   end
 end
+
+--- Gives a vector which maps private hands to rank buckets on a given board.
+-- @param board a non-empty vector of board cards
+-- @return a vector which maps each private hand to a rank bucket index
+function M:compute_rank_buckets(board)
+  local buckets = arguments.Tensor(game_settings.hand_count):fill(-1)
+
+  local ranks = evaluator:batch_eval(board,-1)
+  local sorted_ranks, _ = torch.sort(ranks)
+  local rank_idx = 0
+  local rank_idxs = {}
+  for i = 1, sorted_ranks:size(1) do
+    if sorted_ranks[i] == -1 then
+      break
+    end
+    if (i > 1 and sorted_ranks[i] ~= sorted_ranks[i-1]) or i == 1 then
+      rank_idx = rank_idx + 1
+      rank_idxs[sorted_ranks[i]] = rank_idx
+    end
+  end
+
+  for i = 1, ranks:size(1) do
+    if ranks[i] ~= -1 then
+      ranks[i] = rank_idxs[ranks[i]]
+    end
+  end
+
+  return ranks
+end
+
+return M

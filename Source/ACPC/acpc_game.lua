@@ -111,9 +111,9 @@ end
 --- Informs the server that DeepStack is playing a specified action.
 -- @param adviced_action a table specifying the action chosen by Deepstack,
 -- with the fields:
--- 
+--
 -- * `action`: an element of @{constants.acpc_actions}
--- 
+--
 -- * `raise_amount`: the number of chips raised (if `action` is raise)
 function ACPCGame:play_action(adviced_action)
   local message = self.protocol_to_node:action_to_message(self.last_msg, adviced_action)
