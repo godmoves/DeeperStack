@@ -7,7 +7,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 import sys
 import time
-import slum_util
+import slumbot_util
 import socket
 
 if len(sys.argv) < 3:
@@ -33,104 +33,103 @@ time.sleep(2)
 
 response_fun = """
 response = function(data) {
-    global_data = data
-    // We increment actionindex even when we get an error message back.
-    // If we didn't, then when we retried the action that triggered the error,
-    // it would get flagged as a duplicate.
-    ++actionindex;
-    if ("errormsg" in data) {
-  var errormsg = data["errormsg"];
-  $("#msg").text(errormsg);
-  // Some errors end the hand (e.g., server timeout)
-  // Would it be cleaner to treat a server timeout like a client
-  // timeout?  Return msg rather than errormsg?
-  if ("hip" in data) {
+  global_data = data
+  // We increment actionindex even when we get an error message back.
+  // If we didn't, then when we retried the action that triggered the error,
+  // it would get flagged as a duplicate.
+  ++actionindex;
+  if ("errormsg" in data) {
+    var errormsg = data["errormsg"];
+    $("#msg").text(errormsg);
+    // Some errors end the hand (e.g., server timeout)
+    // Would it be cleaner to treat a server timeout like a client
+    // timeout?  Return msg rather than errormsg?
+    if ("hip" in data) {
       handinprogress = (data["hip"] === 1);
-  }
-  // Need this for server timeout.  Want to enable the "Next Hand"
-  // button and disable all the other buttons.
-  enableactions();
-  return;
-    } else if ("msg" in data) {
-  var msg = data["msg"];
-  $("#msg").text(msg);
-
-    } else {
-  $("#msg").text("");
     }
-
-    if (actiontype === 1) {
-  addourcheck();
-    } else if (actiontype === 2) {
-  addourcall();
-    } else if (actiontype === 3) {
-  addourfold();
-    } else if (actiontype === 4) {
-  addourbet();
-    }
-    $("#betsize").val("");
-    potsize = data["ps"];
-    ourbet = data["ourb"];
-    oppbet = data["oppb"];
-    var lastcurrentaction = currentaction;
-    currentaction = data["action"];
-    var actiondisplay = currentaction;
-    $("#currentaction").text(actiondisplay);
-    var overlap = currentaction.substring(0, lastcurrentaction.length);
-    if (overlap !== lastcurrentaction) {
-  console.log("Overlap " + overlap);
-  console.log("Last current action " + lastcurrentaction);
-    } else {
-  var newaction = currentaction.substring(lastcurrentaction.length,
-            currentaction.length);
-  oppactionmessage(newaction);
-    }
-
-    parsedata(data);
-    drawall(aftershowdown);
-    lifetimetotal = data["ltotal"];
-    lifetimeconf = data["lconf"];
-    lifetimebaselinetotal = data["lbtotal"];
-    lifetimebaselineconf = data["lbconf"];
-    numlifetimehands = data["lhands"];
-    showdowntotal = data["sdtotal"];
-    showdownconf = data["sdconf"];
-    numshowdownhands = data["sdhands"];
-    blbshowdowntotal = data["blbsdtotal"];
-    blbshowdownconf = data["blbsdconf"];
-    blbnumshowdownhands = data["blbsdhands"];
-    clbshowdowntotal = data["clbsdtotal"];
-    clbshowdownconf = data["clbsdconf"];
-    clbnumshowdownhands = data["clbsdhands"];
-    if (username !== "") displaystats();
-    if (! handinprogress) {
-  sessiontotal = data["stotal"];
-  $("#sessiontotal").text(sessiontotal);
-  numsessionhands = data["shands"];
-  $("#numhands").text(numsessionhands);
-  var outcome = data["outcome"];
-  if (outcome > 0) {
-      $("#outcome").text("You won a pot of " + outcome + "!");
-  } else if (outcome < 0) {
-      $("#outcome").text("Slumbot won a pot of " + -outcome +
-             "!");
-  } else {
-            $("#outcome").text("You chopped!");
-  }
-    } else {
-  $("#outcome").text("");
-  starttimer();
-    }
+    // Need this for server timeout.  Want to enable the "Next Hand"
+    // button and disable all the other buttons.
     enableactions();
+    return;
+  } else if ("msg" in data) {
+    var msg = data["msg"];
+    $("#msg").text(msg);
+  } else {
+    $("#msg").text("");
+  }
+
+  if (actiontype === 1) {
+    addourcheck();
+  } else if (actiontype === 2) {
+    addourcall();
+  } else if (actiontype === 3) {
+    addourfold();
+  } else if (actiontype === 4) {
+    addourbet();
+  }
+  $("#betsize").val("");
+  potsize = data["ps"];
+  ourbet = data["ourb"];
+  oppbet = data["oppb"];
+  var lastcurrentaction = currentaction;
+  currentaction = data["action"];
+  var actiondisplay = currentaction;
+  $("#currentaction").text(actiondisplay);
+  var overlap = currentaction.substring(0, lastcurrentaction.length);
+  if (overlap !== lastcurrentaction) {
+    console.log("Overlap " + overlap);
+    console.log("Last current action " + lastcurrentaction);
+  } else {
+    var newaction = currentaction.substring(lastcurrentaction.length,
+      currentaction.length);
+    oppactionmessage(newaction);
+  }
+
+  parsedata(data);
+  drawall(aftershowdown);
+  lifetimetotal = data["ltotal"];
+  lifetimeconf = data["lconf"];
+  lifetimebaselinetotal = data["lbtotal"];
+  lifetimebaselineconf = data["lbconf"];
+  numlifetimehands = data["lhands"];
+  showdowntotal = data["sdtotal"];
+  showdownconf = data["sdconf"];
+  numshowdownhands = data["sdhands"];
+  blbshowdowntotal = data["blbsdtotal"];
+  blbshowdownconf = data["blbsdconf"];
+  blbnumshowdownhands = data["blbsdhands"];
+  clbshowdowntotal = data["clbsdtotal"];
+  clbshowdownconf = data["clbsdconf"];
+  clbnumshowdownhands = data["clbsdhands"];
+  if (username !== "") displaystats();
+    if (! handinprogress) {
+      sessiontotal = data["stotal"];
+      $("#sessiontotal").text(sessiontotal);
+      numsessionhands = data["shands"];
+      $("#numhands").text(numsessionhands);
+      var outcome = data["outcome"];
+      if (outcome > 0) {
+        $("#outcome").text("You won a pot of " + outcome + "!");
+      } else if (outcome < 0) {
+        $("#outcome").text("Slumbot won a pot of " + -outcome +
+                 "!");
+      } else {
+        $("#outcome").text("You chopped!");
+      }
+  } else {
+    $("#outcome").text("");
+    starttimer();
+  }
+  enableactions();
 };
 """
 driver.execute_script(response_fun)
 hand_no = 0
 
-log_in = driver.find_element_by_id("logint_trigger")
+log_in = driver.find_element_by_id("login_trigger")
 log_in.click()
-driver.find_element_by_id("loginname").send_keys("deepstack")
-driver.find_element_by_id("loginpw").send_keys("deepstack\n")
+driver.find_element_by_id("loginname").send_keys("deeperstack_v0.2.0")
+driver.find_element_by_id("loginpw").send_keys("deeperstack\n")
 time.sleep(2)
 
 while True:
@@ -175,7 +174,7 @@ while True:
             time.sleep(1)
 
         # ready to make the action
-        actions, max_bet = slum_util.acpcify_actions(actions)
+        actions, max_bet = slumbot_util.acpcify_actions(actions)
         msg = "MATCHSTATE:" + str(position) + ":" + \
             str(hand_no) + ":" + actions + ":"
         if position == 0:
@@ -183,12 +182,12 @@ while True:
         elif position == 1:
             msg += "|" + hole
         if len(board) > 0:
-            msg += "/" + slum_util.acpcify_board(board)
+            msg += "/" + slumbot_util.acpcify_board(board)
         msg += "\n"
 
-        client_socket.send(msg)
+        client_socket.send(msg.encode())
         sys.stdout.write("sent " + msg + ":")
-        advice = client_socket.recv(100)
+        advice = client_socket.recv(100).decode()
 
         # click button
         print(advice)
